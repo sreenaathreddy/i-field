@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Telecom O&M Field App</title>
+<style>
+/* ─── Reset ─────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#F1F5F9;color:#0F172A;min-height:100vh;overflow-x:hidden}
+button,input,textarea,select{font-family:inherit}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px}
+
+/* ─── Animations ─────────────────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes glow{0%,100%{box-shadow:0 0 4px currentColor}50%{box-shadow:0 0 14px currentColor,0 0 24px currentColor}}
+@keyframes pop{0%{transform:scale(0)}65%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes wave{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+@keyframes levelUp{from{height:0}to{height:var(--h)}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes slideNotif{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ─── Typography helpers ─────────────────────────────────────── */
+.fw9{font-weight:900}.fw8{font-weight:800}.fw7{font-weight:700}.fw6{font-weight:600}
+.fs10{font-size:10px}.fs11{font-size:11px}.fs12{font-size:12px}.fs13{font-size:13px}.fs14{font-size:14px}
+.muted{color:#94A3B8}.ink2{color:#334155}
+
+/* ─── Cards ──────────────────────────────────────────────────── */
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card-tap{cursor:pointer;transition:all .18s}
+.card-tap:active{transform:scale(.98);background:#F8FAFC}
+
+/* ─── Buttons ────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:6px;font-weight:700;border-radius:9px;border:none;cursor:pointer;transition:all .15s;white-space:nowrap;font-size:13px;padding:9px 16px}
+.btn:active{transform:scale(.97)}
+.btn-sky{background:#0EA5E9;color:#fff}
+.btn-sky:hover{background:#0369A1}
+.btn-teal{background:#0D9488;color:#fff}
+.btn-orange{background:#EA580C;color:#fff}
+.btn-green{background:#16A34A;color:#fff}
+.btn-red{background:#DC2626;color:#fff}
+.btn-yellow{background:#D97706;color:#fff}
+.btn-out{background:#fff;color:#334155;border:1.5px solid #E2E8F0}
+.btn-out:hover{border-color:#0EA5E9;color:#0EA5E9}
+.btn-sm{padding:5px 11px!important;font-size:11px!important;border-radius:7px!important}
+.btn-full{width:100%;justify-content:center}
+.btn-ghost{background:transparent;color:#334155;border:1.5px solid #E2E8F0}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+
+/* ─── Inputs ─────────────────────────────────────────────────── */
+.inp{width:100%;background:#fff;border:1.5px solid #E2E8F0;border-radius:9px;padding:10px 13px;font-size:14px;color:#0F172A;outline:none;transition:border .2s}
+.inp:focus{border-color:#0EA5E9;box-shadow:0 0 0 3px rgba(14,165,233,.1)}
+.inp::placeholder{color:#94A3B8}
+.sel{width:100%;background:#fff;border:1.5px solid #E2E8F0;border-radius:9px;padding:10px 13px;font-size:13px;color:#0F172A;outline:none;cursor:pointer}
+
+/* ─── Pills & Tags ───────────────────────────────────────────── */
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:3px 10px 3px 7px;font-size:11px;font-weight:700}
+.tag{border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;display:inline-block}
+.led{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;vertical-align:middle}
+.led-g{background:#16A34A;box-shadow:0 0 5px #16A34A;animation:glow 2s infinite}
+.led-r{background:#DC2626;animation:blink .8s infinite}
+.led-y{background:#D97706;animation:pulse 1.5s infinite}
+.led-b{background:#0EA5E9;animation:glow 2s infinite}
+
+/* ─── Section headers ────────────────────────────────────────── */
+.shdr{font-size:10px;font-weight:800;letter-spacing:1.2px;color:#94A3B8;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.dvdr{height:1px;background:#F1F5F9;margin:12px 0}
+
+/* ─── Login Page ─────────────────────────────────────────────── */
+#loginPage{min-height:100vh;background:linear-gradient(150deg,#0F172A 0%,#1e3a5f 45%,#0D9488 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-wrap{width:100%;max-width:400px}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo-ring{width:72px;height:72px;background:rgba(56,189,248,.15);border:2px solid rgba(56,189,248,.35);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;animation:bounce 2.5s ease-in-out infinite}
+.login-card{background:rgba(255,255,255,.97);border-radius:20px;padding:28px;box-shadow:0 24px 64px rgba(0,0,0,.45)}
+.login-err{background:#FEE2E2;border:1px solid #FCA5A5;border-radius:9px;padding:10px 13px;margin-bottom:14px;font-size:12px;font-weight:600;color:#DC2626;display:none;align-items:center;gap:8px}
+.role-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px}
+.role-chip{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:600}
+
+/* ─── Top Nav ────────────────────────────────────────────────── */
+#topNav{background:#fff;border-bottom:1px solid #E2E8F0;height:54px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.nav-brand{display:flex;align-items:center;gap:8px}
+.nav-icon{width:34px;height:34px;background:#E0F2FE;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.nav-actions{display:flex;align-items:center;gap:8px}
+.role-badge{display:flex;align-items:center;gap:6px;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;border:1.5px solid transparent}
+.notif-btn{position:relative;width:34px;height:34px;border-radius:8px;background:#fff;border:1.5px solid #E2E8F0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.notif-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;background:#DC2626;border-radius:50%;border:2px solid #fff;animation:blink 1.5s infinite}
+
+/* ─── Home Page ──────────────────────────────────────────────── */
+#homePage{padding:16px}
+.search-hero{background:linear-gradient(135deg,#0F172A,#1e3a5f);border-radius:16px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.search-hero::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:rgba(14,165,233,.15);border-radius:50%}
+.search-hero::before{content:'';position:absolute;left:-10px;bottom:-30px;width:80px;height:80px;background:rgba(13,148,136,.12);border-radius:50%}
+.search-hero-title{color:#fff;font-size:17px;font-weight:800;margin-bottom:4px;position:relative;z-index:1}
+.search-hero-sub{color:rgba(255,255,255,.55);font-size:12px;margin-bottom:14px;position:relative;z-index:1}
+.search-box{position:relative;z-index:1}
+.search-box input{width:100%;background:rgba(255,255,255,.95);border:none;border-radius:10px;padding:11px 16px 11px 40px;font-size:14px;outline:none}
+.search-box-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.stat-box{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat-box-val{font-size:22px;font-weight:900;line-height:1}
+.stat-box-lbl{font-size:9px;color:#94A3B8;font-weight:700;margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+.section-title{font-size:13px;font-weight:800;color:#334155;margin-bottom:10px;display:flex;align-items:center;gap:6px;letter-spacing:-.2px}
+
+.site-card{background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .18s;box-shadow:0 1px 4px rgba(0,0,0,.07);animation:fadeUp .35s cubic-bezier(.34,1.2,.64,1) both}
+.site-card:active{transform:scale(.98);background:#F8FAFC}
+.site-card.live-border{border-color:rgba(22,163,74,.3)}
+.site-card.off-border{border-color:rgba(220,38,38,.25)}
+
+/* ─── Site Detail ────────────────────────────────────────────── */
+#sitePage{display:none;flex-direction:column;min-height:100vh}
+.site-header{background:#fff;border-bottom:1px solid #E2E8F0;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.site-title-block{flex:1;min-width:0}
+.back-btn{width:34px;height:34px;border-radius:8px;background:#F1F5F9;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+
+/* ─── Horizontal Tab Strip ───────────────────────────────────── */
+.tab-strip-wrap{background:#fff;border-bottom:2px solid #F1F5F9;position:sticky;top:54px;z-index:100}
+.tab-strip{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0 16px;gap:2px}
+.tab-strip::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:12px 14px;background:none;border:none;cursor:pointer;font-size:12px;font-weight:700;color:#94A3B8;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .15s;scroll-snap-align:start;display:flex;align-items:center;gap:6px}
+.tab-btn.active{color:var(--tc,#0EA5E9);border-bottom-color:var(--tc,#0EA5E9)}
+.tab-content-wrap{flex:1}
+.tab-panel{display:none;padding:16px;animation:fadeIn .25s ease}
+.tab-panel.active{display:block}
+
+/* ─── Info rows ──────────────────────────────────────────────── */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-item{background:#F8FAFC;border-radius:10px;padding:10px 12px}
+.info-lbl{font-size:10px;color:#94A3B8;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.info-val{font-size:13px;font-weight:700;color:#0F172A;word-break:break-word}
+
+/* ─── Fuel tank ──────────────────────────────────────────────── */
+.tank-outer{width:60px;height:120px;border-radius:8px 8px 10px 10px;overflow:hidden;position:relative;background:#F8FAFC}
+.tank-fill{position:absolute;bottom:0;left:0;right:0;transition:height 1.4s cubic-bezier(.34,1.3,.64,1);border-radius:0 0 8px 8px}
+.tank-wave{position:absolute;top:-4px;left:0;right:0;height:8px;border-radius:50%;animation:wave 1.5s ease-in-out infinite}
+.tank-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:900;color:rgba(255,255,255,.95);text-shadow:0 1px 3px rgba(0,0,0,.4);pointer-events:none;z-index:4}
+.seg-bar{display:flex;gap:3px;margin:6px 0}
+.seg{flex:1;height:8px;border-radius:4px;transition:background .07s ease}
+
+/* ─── Battery ─────────────────────────────────────────────────── */
+.bat-grid{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#F8FAFC;border-radius:10px}
+.bat-u{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;transition:opacity .2s}
+.bat-body{width:22px;height:40px;border-radius:3px 3px 5px 5px;overflow:hidden;position:relative}
+.bat-fill{position:absolute;bottom:0;left:0;right:0;transition:height .9s ease}
+.bat-cap{width:9px;height:4px;border-radius:2px 2px 0 0;margin:0 auto}
+.bat-lbl{font-size:7px;font-weight:800;text-align:center;line-height:1.3}
+
+/* ─── Rect ─────────────────────────────────────────────────────── */
+.rect-u{flex:1 1 130px;min-width:110px;border-radius:11px;padding:12px;text-align:center;cursor:pointer;transition:all .2s;border:2px solid transparent}
+.rect-body{width:54px;height:40px;margin:0 auto 8px;border-radius:7px;display:flex;align-items:center;justify-content:center;position:relative}
+
+/* ─── EB payment ──────────────────────────────────────────────── */
+.eb-month-card{border-radius:12px;border:1.5px solid #E2E8F0;overflow:hidden;margin-bottom:10px}
+.eb-card-head{padding:11px 14px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.eb-card-body{padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.eb-tile{background:#F8FAFC;border-radius:9px;padding:9px 11px}
+.eb-tile-lbl{font-size:9px;color:#94A3B8;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.eb-tile-val{font-size:14px;font-weight:800}
+
+/* ─── Spare Part Request ─────────────────────────────────────── */
+.req-card{border:1.5px solid #E2E8F0;border-radius:12px;overflow:hidden;margin-bottom:10px;background:#fff}
+.req-head{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid #F1F5F9}
+.req-body{padding:12px 14px}
+.req-flow{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:8px}
+.req-node{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.req-arrow{color:#CBD5E1;font-size:12px}
+
+/* ─── Approval flow ───────────────────────────────────────────── */
+.flow-steps{display:flex;align-items:center;gap:0;margin:12px 0;overflow-x:auto;padding-bottom:4px}
+.flow-step{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.flow-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2.5px solid #E2E8F0;background:#F8FAFC;transition:all .3s}
+.flow-circle.done{background:var(--col);border-color:var(--col)}
+.flow-circle.active{background:#E0F2FE;border-color:#0EA5E9;animation:glow 2s infinite}
+.flow-line{width:24px;height:2px;background:#E2E8F0;flex-shrink:0;margin-top:-18px}
+.flow-line.done{background:#16A34A}
+.flow-step-lbl{font-size:8px;font-weight:700;margin-top:4px;color:#94A3B8;text-align:center;max-width:44px}
+
+/* ─── Modal ────────────────────────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:600;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);animation:fadeIn .2s ease}
+.modal-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.34,1.2,.64,1) both;padding-bottom:env(safe-area-inset-bottom,16px)}
+.modal-sheet-center{border-radius:16px;max-height:90vh;width:calc(100% - 32px);max-width:440px;margin:auto;animation:pop .28s cubic-bezier(.34,1.3,.64,1) both}
+.modal-overlay.center{align-items:center}
+.modal-drag{width:36px;height:4px;background:#E2E8F0;border-radius:99px;margin:12px auto 6px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #F1F5F9}
+.modal-close{width:30px;height:30px;border-radius:8px;background:#F1F5F9;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
+.modal-body{padding:16px 18px}
+
+/* ─── Notification toast ─────────────────────────────────────── */
+.toast-container{position:fixed;bottom:16px;right:16px;z-index:700;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.toast{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:11px 14px;box-shadow:0 4px 20px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;max-width:300px;animation:slideNotif .35s ease both;font-size:13px;font-weight:600}
+
+/* ─── GPS checkin banner ─────────────────────────────────────── */
+.gps-banner{border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px}
+
+/* ─── PM Status chips ────────────────────────────────────────── */
+.pm-chip{display:inline-flex;align-items:center;gap:5px;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700}
+
+/* ─── Utility ────────────────────────────────────────────────── */
+.row{display:flex;align-items:center;gap:8px}
+.col{display:flex;flex-direction:column;gap:6px}
+.between{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.mt8{margin-top:8px}
+.mt12{margin-top:12px}
+.mt16{margin-top:16px}
+.mb8{margin-bottom:8px}
+.mb12{margin-bottom:12px}
+.mb16{margin-bottom:16px}
+.w100{width:100%}
+.ellipsis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alert-box{border-radius:10px;padding:10px 13px;border-left:3px solid;display:flex;align-items:flex-start;gap:8px;font-size:12px;font-weight:600}
+.co-badge{display:inline-flex;align-items:center;gap:5px;border-radius:7px;padding:3px 9px;font-size:12px;border:1.5px solid transparent}
+.co-init{border-radius:4px;padding:1px 5px;font-weight:900;font-size:11px;color:#fff}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ LOGIN PAGE ══════════════════════════ -->
+<div id="loginPage">
+<div class="login-wrap">
+  <div class="login-logo">
+    <div class="login-logo-ring">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2.2" width="34" height="34"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg>
+    </div>
+    <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px">Telecom O&amp;M</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.5);margin-top:4px">Field Operations Management System</div>
+    <div class="role-chips">
+      <span class="role-chip">Technician</span>
+      <span class="role-chip">Rigger</span>
+      <span class="role-chip">IE</span>
+      <span class="role-chip">IL</span>
+      <span class="role-chip">JC Store</span>
+      <span class="role-chip">Admin</span>
+    </div>
+  </div>
+  <div class="login-card">
+    <div class="fw8" style="font-size:19px;margin-bottom:4px">Welcome Back</div>
+    <div class="ink2 fs13 mb16">Sign in with your credentials</div>
+    <div class="login-err" id="lErr">
+      <span>⚠</span><span id="lErrMsg"></span>
+    </div>
+    <div class="mb12">
+      <label class="fs11 fw7 ink2" style="display:block;margin-bottom:6px">Email Address</label>
+      <input id="lEmail" class="inp" type="email" placeholder="you@telecom.com" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div style="margin-bottom:20px">
+      <label class="fs11 fw7 ink2" style="display:block;margin-bottom:6px">Password</label>
+      <div style="position:relative">
+        <input id="lPw" class="inp" type="password" placeholder="Enter password" style="padding-right:42px" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <button onclick="var i=document.getElementById('lPw');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;color:#94A3B8">👁</button>
+      </div>
+    </div>
+    <button id="lBtn" class="btn btn-sky btn-full" onclick="doLogin()" style="height:44px;font-size:15px;border-radius:11px;background:linear-gradient(135deg,#0EA5E9,#0D9488)">
+      Sign In →
+    </button>
+    <div style="margin-top:14px;font-size:11px;color:#94A3B8;text-align:center">
+      Demo: <b>tech@telecom.com</b> / <b>tech123</b> &nbsp;|&nbsp; <b>ie@telecom.com</b> / <b>ie123</b>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════ APP SHELL ══════════════════════════ -->
+<div id="appShell" style="display:none;flex-direction:column;min-height:100vh">
+
+  <!-- Top Nav -->
+  <div id="topNav">
+    <div class="nav-brand">
+      <div class="nav-icon">🔧</div>
+      <div>
+        <div class="fw9 fs14" style="letter-spacing:-.3px">Telecom O&amp;M</div>
+        <div class="muted" style="font-size:9px">Field Operations</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <div class="notif-btn" onclick="toggleNotif()" id="notifBtn">🔔<span class="notif-dot"></span></div>
+      <div id="roleBadge" class="role-badge"></div>
+      <button class="btn btn-out btn-sm" onclick="doLogout()">Exit</button>
+    </div>
+  </div>
+
+  <!-- Home Page -->
+  <div id="homePage">
+    <div class="search-hero">
+      <div class="search-hero-title">Good Morning, Field Ops! 👋</div>
+      <div class="search-hero-sub">Search a site or tap a card below to begin</div>
+      <div class="search-box">
+        <span class="search-box-icon">🔍</span>
+        <input id="siteSearch" type="text" placeholder="Search Site ID, name, circle, cluster…" oninput="filterSites(this.value)"/>
+      </div>
+    </div>
+    <div class="stat-strip" id="statsStrip"></div>
+    <div class="section-title">📡 All Sites <span id="siteCount" class="tag" style="background:#E0F2FE;color:#0EA5E9"></span></div>
+    <div id="siteList"></div>
+  </div>
+
+  <!-- Site Detail Page -->
+  <div id="sitePage">
+    <div class="site-header">
+      <div class="back-btn" onclick="goHome()">←</div>
+      <div class="site-title-block">
+        <div class="fw8 fs14 ellipsis" id="siteHeaderId"></div>
+        <div class="muted fs11 ellipsis" id="siteHeaderName"></div>
+      </div>
+      <div id="siteHeaderBadge"></div>
+    </div>
+    <!-- GPS Check-in banner (inside site page, above tabs) -->
+    <div style="padding:10px 16px 0">
+      <div class="gps-banner" id="gpsBanner">
+        <div class="row" style="gap:10px">
+          <div style="font-size:22px">📍</div>
+          <div>
+            <div class="fw7 fs13">GPS Check-in</div>
+            <div class="muted fs11" id="gpsCoords"></div>
+            <div id="gpsTime" class="fs10 fw7" style="color:#16A34A;display:none">✓ Checked in</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-sky" id="gpsBtn" onclick="doCheckIn()">Check In</button>
+      </div>
+    </div>
+    <!-- Horizontal swipeable tabs -->
+    <div class="tab-strip-wrap">
+      <div class="tab-strip" id="tabStrip"></div>
+    </div>
+    <!-- Tab panels container -->
+    <div id="tabContent"></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════ MODALS ══════════════════════════════ -->
+<div id="modalRoot"></div>
+<div class="toast-container" id="toastRoot"></div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     APP JAVASCRIPT
+═════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════════════
+
+var USERS = [
+  {email:'tech@telecom.com',  pw:'tech123',  role:'Technician',   name:'Arjun Sharma'},
+  {email:'rigger@telecom.com',pw:'rig123',   role:'Rigger',       name:'Ravi Das'},
+  {email:'ie@telecom.com',    pw:'ie123',    role:'IE',           name:'Priya Mehta'},
+  {email:'il@telecom.com',    pw:'il123',    role:'IL',           name:'Suresh Pillai'},
+  {email:'store@telecom.com', pw:'store123', role:'JC Store',     name:'Deepak Nair'},
+  {email:'admin@telecom.com', pw:'admin123', role:'Admin',        name:'Admin User'},
+];
+
+var ROLE_META = {
+  'Technician':  {col:'#0EA5E9',  bg:'#E0F2FE',  canRaise:true,  canApprove:false, isStore:false},
+  'Rigger':      {col:'#0D9488',  bg:'#CCFBF1',  canRaise:true,  canApprove:false, isStore:false},
+  'IE':          {col:'#7C3AED',  bg:'#EDE9FE',  canRaise:false, canApprove:true,  isStore:false, approveLevel:1},
+  'IL':          {col:'#D97706',  bg:'#FEF3C7',  canRaise:false, canApprove:true,  isStore:false, approveLevel:2},
+  'JC Store':    {col:'#16A34A',  bg:'#DCFCE7',  canRaise:false, canApprove:true,  isStore:true,  approveLevel:3},
+  'Admin':       {col:'#DC2626',  bg:'#FEE2E2',  canRaise:true,  canApprove:true,  isStore:true},
+};
+
+var SITES = [
+  {id:'APHYD2345', name:'Hyderabad Central Tower', circle:'AP',  cluster:'HYD-NORTH', lat:'17.3850', lng:'78.4867', live:true,  tenants:3, ops:['Jio','Airtel','Vi']},
+  {id:'MHPUN1122', name:'Pune West BTS',           circle:'MH',  cluster:'PUNE-WEST', lat:'18.5204', lng:'73.8567', live:true,  tenants:2, ops:['Airtel','BSNL']},
+  {id:'KABLR0987', name:'Bangalore Tech Park',     circle:'KA',  cluster:'BLR-EAST',  lat:'12.9716', lng:'77.5946', live:false, tenants:4, ops:['Jio','Airtel','Vi','BSNL']},
+  {id:'TNCHE0011', name:'Chennai North Hub',        circle:'TN',  cluster:'CHN-NORTH', lat:'13.0827', lng:'80.2707', live:true,  tenants:2, ops:['Jio','BSNL']},
+  {id:'RJJPR0456', name:'Jaipur City Tower',        circle:'RJ',  cluster:'JPR-EAST',  lat:'26.9124', lng:'75.7873', live:true,  tenants:3, ops:['Airtel','Vi','Jio']},
+];
+
+var INFRA = {
+  'APHYD2345':{
+    power:'DG + Grid',
+    dg:{co:'Cummins',    sn:'CUM-2020-HYD-4521', cap:'125 kVA', tank:'250 L', fuel:72, fuelOk:true,
+        battCo:'Amara Raja', battSn:'AR-12V-200AH-7865', battCap:'12V / 200Ah',
+        kw:'4521 kWh', hmr:'1240 hrs', hmrNum:1240,
+        nextTopup:'12 May 2025', nextPM:'01 Jun 2025', lastPM:'01 Mar 2025'},
+    bat:{co:'Exide', cap:'2V / 1000Ah VRLA', cnt:8, health:85,
+         working:[1,1,1,1,1,1,1,0],
+         serials:['EX-001','EX-002','EX-003','EX-004','EX-005','EX-006','EX-007','EX-008']},
+    rect:{co:'Eltek', model:'Flatpack2 HE 48V', cnt:2, load:68, working:[1,1]},
+    eb:{
+      months:[
+        {mo:'Apr 2025', open:14230, close:16890, units:2660, rate:7.5, amount:19950, paid:true,  paidDt:'08 Apr 2025', bill:'TSEB-HYD-0425'},
+        {mo:'Mar 2025', open:11520, close:14230, units:2710, rate:7.5, amount:20325, paid:true,  paidDt:'07 Mar 2025', bill:'TSEB-HYD-0325'},
+        {mo:'Feb 2025', open:8900,  close:11520, units:2620, rate:7.5, amount:19650, paid:true,  paidDt:'06 Feb 2025', bill:'TSEB-HYD-0225'},
+        {mo:'Jan 2025', open:6200,  close:8900,  units:2700, rate:7.5, amount:20250, paid:true,  paidDt:'07 Jan 2025', bill:'TSEB-HYD-0125'},
+        {mo:'Dec 2024', open:3600,  close:6200,  units:2600, rate:7.5, amount:19500, paid:true,  paidDt:'09 Dec 2024', bill:'TSEB-HYD-1224'},
+        {mo:'Nov 2024', open:1000,  close:3600,  units:2600, rate:7.5, amount:19500, paid:true,  paidDt:'05 Nov 2024', bill:'TSEB-HYD-1124'},
+        {mo:'Oct 2024', open:0,     close:1000,  units:1000, rate:7.5, amount:7500,  paid:true,  paidDt:'08 Oct 2024', bill:'TSEB-HYD-1024'},
+      ],
+      fyStart: 'Apr 2024',
+      sanctionedLoad: '25 kW',
+      tariff: 'HT-II Commercial',
+      consumerNo: 'TSEB-HYD-4521',
+    },
+    alarms:['Low fuel warning (DG below 30%)'],
+    solar:'Active', grid:'Available',
+  },
+  'MHPUN1122':{
+    power:'Grid Only',
+    dg:{co:'Kirloskar', sn:'KG-2019-PUN-1122', cap:'62.5 kVA', tank:'140 L', fuel:0, fuelOk:false,
+        battCo:'Exide', battSn:'EX-12V-100AH-3210', battCap:'12V / 100Ah',
+        kw:'2198 kWh', hmr:'0 hrs', hmrNum:0,
+        nextTopup:'N/A (Grid only)', nextPM:'15 Jun 2025', lastPM:'15 Mar 2025'},
+    bat:{co:'Amara Raja', cap:'2V / 500Ah VRLA', cnt:4, health:92, working:[1,1,1,1], serials:['AR-101','AR-102','AR-103','AR-104']},
+    rect:{co:'Vertiv', model:'NetSure 701 A48', cnt:1, load:45, working:[1]},
+    eb:{
+      months:[
+        {mo:'Apr 2025', open:8100, close:9400, units:1300, rate:7.0, amount:9100, paid:true,  paidDt:'07 Apr 2025', bill:'MSEB-PUN-0425'},
+        {mo:'Mar 2025', open:6800, close:8100, units:1300, rate:7.0, amount:9100, paid:true,  paidDt:'06 Mar 2025', bill:'MSEB-PUN-0325'},
+        {mo:'Feb 2025', open:5500, close:6800, units:1300, rate:7.0, amount:9100, paid:true,  paidDt:'05 Feb 2025', bill:'MSEB-PUN-0225'},
+      ],
+      fyStart:'Apr 2024', sanctionedLoad:'15 kW', tariff:'LT-II Commercial', consumerNo:'MSEB-PUN-1122',
+    },
+    alarms:[],
+    solar:'Inactive', grid:'Available',
+  },
+  'KABLR0987':{
+    power:'DG + Grid + Solar',
+    dg:{co:'Mahindra Powerol', sn:'MP-2018-BLR-9870', cap:'82.5 kVA', tank:'200 L', fuel:18, fuelOk:true,
+        battCo:'Amara Raja', battSn:'AR-12V-150AH-5643', battCap:'12V / 150Ah',
+        kw:'8834 kWh', hmr:'3890 hrs', hmrNum:3890,
+        nextTopup:'05 May 2025', nextPM:'20 May 2025', lastPM:'20 Feb 2025'},
+    bat:{co:'HBL Power', cap:'2V / 800Ah VRLA', cnt:12, health:61, working:[1,1,0,1,1,0,1,1,1,0,1,1], serials:['HBL-201','HBL-202','HBL-203','HBL-204','HBL-205','HBL-206','HBL-207','HBL-208','HBL-209','HBL-210','HBL-211','HBL-212']},
+    rect:{co:'Delta Electronics', model:'DPH 48/30 HE', cnt:3, load:88, working:[1,0,1]},
+    eb:{
+      months:[
+        {mo:'Apr 2025', open:22100, close:24300, units:2200, rate:6.8, amount:14960, paid:false, paidDt:null, bill:'BESCOM-BLR-0425'},
+        {mo:'Mar 2025', open:19900, close:22100, units:2200, rate:6.8, amount:14960, paid:true,  paidDt:'08 Mar 2025', bill:'BESCOM-BLR-0325'},
+        {mo:'Feb 2025', open:17700, close:19900, units:2200, rate:6.8, amount:14960, paid:true,  paidDt:'07 Feb 2025', bill:'BESCOM-BLR-0225'},
+      ],
+      fyStart:'Apr 2024', sanctionedLoad:'20 kW', tariff:'HT-I Industrial', consumerNo:'BESCOM-BLR-9870',
+    },
+    alarms:['Mains fail','DG fuel critical (18%)','Battery health low (61%)'],
+    solar:'Active', grid:'Fail',
+  },
+  'TNCHE0011':{
+    power:'Grid + Solar',
+    dg:{co:'Cummins', sn:'CUM-2021-CHN-0011', cap:'100 kVA', tank:'200 L', fuel:55, fuelOk:true,
+        battCo:'Exide', battSn:'EX-12V-180AH-4411', battCap:'12V / 180Ah',
+        kw:'3210 kWh', hmr:'890 hrs', hmrNum:890,
+        nextTopup:'20 May 2025', nextPM:'10 Jun 2025', lastPM:'10 Mar 2025'},
+    bat:{co:'Exide', cap:'2V / 600Ah VRLA', cnt:6, health:78, working:[1,1,1,1,1,0], serials:['EX-A01','EX-A02','EX-A03','EX-A04','EX-A05','EX-A06']},
+    rect:{co:'Eltek', model:'Flatpack2 48V', cnt:2, load:55, working:[1,1]},
+    eb:{
+      months:[
+        {mo:'Apr 2025', open:5500, close:6700, units:1200, rate:7.2, amount:8640, paid:true, paidDt:'06 Apr 2025', bill:'TNEB-CHN-0425'},
+        {mo:'Mar 2025', open:4300, close:5500, units:1200, rate:7.2, amount:8640, paid:true, paidDt:'05 Mar 2025', bill:'TNEB-CHN-0325'},
+      ],
+      fyStart:'Apr 2024', sanctionedLoad:'18 kW', tariff:'LT-III Commercial', consumerNo:'TNEB-CHN-0011',
+    },
+    alarms:['Battery bank 6 fault'],
+    solar:'Active', grid:'Available',
+  },
+  'RJJPR0456':{
+    power:'DG + Grid',
+    dg:{co:'Kirloskar', sn:'KG-2020-JPR-0456', cap:'75 kVA', tank:'160 L', fuel:45, fuelOk:true,
+        battCo:'Amara Raja', battSn:'AR-12V-120AH-2201', battCap:'12V / 120Ah',
+        kw:'5620 kWh', hmr:'2100 hrs', hmrNum:2100,
+        nextTopup:'15 May 2025', nextPM:'25 May 2025', lastPM:'25 Feb 2025'},
+    bat:{co:'Amara Raja', cap:'2V / 750Ah VRLA', cnt:8, health:88, working:[1,1,1,1,1,1,1,1], serials:['AM-001','AM-002','AM-003','AM-004','AM-005','AM-006','AM-007','AM-008']},
+    rect:{co:'Vertiv', model:'NetSure 720 A48', cnt:2, load:60, working:[1,1]},
+    eb:{
+      months:[
+        {mo:'Apr 2025', open:9800, close:11100, units:1300, rate:6.5, amount:8450, paid:true, paidDt:'09 Apr 2025', bill:'JVVNL-JPR-0425'},
+        {mo:'Mar 2025', open:8500, close:9800,  units:1300, rate:6.5, amount:8450, paid:true, paidDt:'08 Mar 2025', bill:'JVVNL-JPR-0325'},
+      ],
+      fyStart:'Apr 2024', sanctionedLoad:'15 kW', tariff:'HT-II Commercial', consumerNo:'JVVNL-JPR-0456',
+    },
+    alarms:[],
+    solar:'Inactive', grid:'Available',
+  },
+};
+
+// Spare part requests — shared across app
+var SPARE_REQUESTS = [
+  {id:'SPR-001', siteId:'KABLR0987', part:'Rectifier Module - Eltek 48V', qty:1, reason:'Module R-2 offline, load exceeds threshold', raisedBy:'Arjun Sharma', raisedRole:'Technician', dt:'28 Apr 2025', status:'IE_APPROVED', ieBy:'Priya Mehta', ieDt:'29 Apr 2025', ilBy:null, ilDt:null, storeBy:null, storeDt:null, urgent:true},
+  {id:'SPR-002', siteId:'APHYD2345', part:'Battery VRLA 2V 1000Ah', qty:1, reason:'Battery B8 fault - completely dead', raisedBy:'Ravi Das', raisedRole:'Rigger', dt:'26 Apr 2025', status:'PENDING_IE', ieBy:null, ieDt:null, ilBy:null, ilDt:null, storeBy:null, storeDt:null, urgent:false},
+  {id:'SPR-003', siteId:'TNCHE0011', part:'Battery VRLA 2V 600Ah', qty:1, reason:'Battery A6 FAULT indicator', raisedBy:'Arjun Sharma', raisedRole:'Technician', dt:'27 Apr 2025', status:'ISSUED', ieBy:'Priya Mehta', ieDt:'27 Apr 2025', ilBy:'Suresh Pillai', ilDt:'28 Apr 2025', storeBy:'Deepak Nair', storeDt:'29 Apr 2025', urgent:false},
+];
+
+var STATUS_FLOW = {
+  'PENDING_IE':   {label:'Pending IE',     col:'#D97706', bg:'#FEF3C7', step:0},
+  'IE_APPROVED':  {label:'IE Approved',    col:'#7C3AED', bg:'#EDE9FE', step:1},
+  'IL_APPROVED':  {label:'IL Approved',    col:'#0EA5E9', bg:'#E0F2FE', step:2},
+  'ISSUED':       {label:'Parts Issued',   col:'#16A34A', bg:'#DCFCE7', step:3},
+  'REJECTED':     {label:'Rejected',       col:'#DC2626', bg:'#FEE2E2', step:-1},
+};
+
+// ════════════════════════════════════════════════════════════════
+// APP STATE
+// ════════════════════════════════════════════════════════════════
+var APP = {
+  user: null,
+  currentSite: null,
+  currentTab: 'basic',
+  checkedIn: {},    // siteId -> timestamp
+  filterQ: '',
+};
+
+// ════════════════════════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════════════════════════
+function h(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function rs(n){ return 'Rs.' + Number(n).toLocaleString('en-IN'); }
+function $(id){ return document.getElementById(id); }
+function show(id,d){ var e=$(id); if(e) e.style.display=d||'block'; }
+function hide(id){ var e=$(id); if(e) e.style.display='none'; }
+function set(id,html){ var e=$(id); if(e) e.innerHTML=html; }
+
+function pill(status, label, col, bg){
+  return '<span class="pill" style="background:'+bg+';color:'+col+'"><span class="led" style="background:'+col+';animation:glow 2s infinite"></span>'+h(label||status)+'</span>';
+}
+function tag(t,c,bg){ return '<span class="tag" style="background:'+(bg||c+'18')+';color:'+c+'">'+h(t)+'</span>'; }
+
+function coBadge(name){
+  var map={
+    'Cummins':'#003399','Kirloskar':'#e63012','Mahindra Powerol':'#c8102e',
+    'Exide':'#1a237e','Amara Raja':'#d32f2f','HBL Power':'#1565c0',
+    'Eltek':'#006d77','Vertiv':'#e65100','Delta Electronics':'#1b5e20',
+  };
+  var col = map[name]||'#0EA5E9';
+  var init = name.split(' ').map(function(w){return w[0];}).join('').slice(0,3).toUpperCase();
+  return '<span class="co-badge" style="background:'+col+'18;border-color:'+col+'40"><span class="co-init" style="background:'+col+'">'+init+'</span><span class="fw7 fs12">'+h(name)+'</span></span>';
+}
+
+function shdr(icon, text, col){
+  return '<div class="shdr" style="color:'+(col||'#94A3B8')+'">'+icon+' '+h(text)+'</div>';
+}
+
+function infoGrid(items){
+  var html='<div class="info-grid">';
+  items.forEach(function(it){
+    html+='<div class="info-item"><div class="info-lbl">'+h(it.l)+'</div><div class="info-val">'+it.v+'</div></div>';
+  });
+  return html+'</div>';
+}
+
+function toast(msg, type){
+  var tc={info:'#0EA5E9',success:'#16A34A',warn:'#D97706',error:'#DC2626'};
+  var icons={info:'ℹ️',success:'✅',warn:'⚠️',error:'❌'};
+  var col = tc[type||'info'];
+  var t = document.createElement('div');
+  t.className='toast';
+  t.style.borderLeft='3px solid '+col;
+  t.innerHTML = icons[type||'info']+' <span>'+h(msg)+'</span>';
+  $('toastRoot').appendChild(t);
+  setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 3500);
+}
+
+function showModal(html, center){
+  var ov = document.createElement('div');
+  ov.className = 'modal-overlay'+(center?' center':'');
+  ov.id = 'activeModal';
+  var box = document.createElement('div');
+  box.className = 'modal-sheet'+(center?' modal-sheet-center':'');
+  box.innerHTML = html;
+  box.onclick = function(e){ e.stopPropagation(); };
+  ov.onclick = closeModal;
+  ov.appendChild(box);
+  $('modalRoot').appendChild(ov);
+}
+function closeModal(){
+  var m = $('activeModal');
+  if(m) m.parentNode.removeChild(m);
+}
+
+// ════════════════════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════════════════════
+function doLogin(){
+  var email = $('lEmail').value.trim().toLowerCase();
+  var pw    = $('lPw').value;
+  var btn   = $('lBtn');
+  btn.disabled=true;
+  btn.innerHTML='<div style="width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Signing in…';
+
+  setTimeout(function(){
+    var u = USERS.find(function(u){ return u.email===email && u.pw===pw; });
+    if(u){
+      APP.user = u;
+      $('lErr').style.display='none';
+      initApp();
+    } else {
+      $('lErr').style.display='flex';
+      $('lErrMsg').textContent='Invalid credentials. Try: tech@telecom.com / tech123';
+      btn.disabled=false;
+      btn.innerHTML='Sign In →';
+    }
+  }, 700);
+}
+
+function doLogout(){
+  APP.user=null; APP.currentSite=null;
+  hide('appShell'); show('loginPage');
+  $('lEmail').value=''; $('lPw').value='';
+  var btn=$('lBtn'); btn.disabled=false; btn.innerHTML='Sign In →';
+}
+
+function initApp(){
+  hide('loginPage');
+  $('appShell').style.display='flex';
+  var rm = ROLE_META[APP.user.role];
+  var rb=$('roleBadge');
+  rb.style.background=rm.bg; rb.style.borderColor=rm.col+'40'; rb.style.color=rm.col;
+  rb.textContent=APP.user.role;
+  goHome();
+}
+
+// ════════════════════════════════════════════════════════════════
+// HOME PAGE
+// ════════════════════════════════════════════════════════════════
+function goHome(){
+  APP.currentSite=null;
+  hide('sitePage'); show('homePage');
+  renderStats();
+  renderSiteList('');
+  // Update greeting
+  var h2 = new Date().getHours();
+  var greet = h2<12?'Good Morning':h2<17?'Good Afternoon':'Good Evening';
+  var heroTitle = $('homePage').querySelector('.search-hero-title');
+  if(heroTitle) heroTitle.textContent = greet+', '+APP.user.name+'! 👋';
+  $('siteSearch').value='';
+}
+
+function renderStats(){
+  var total = SITES.length;
+  var live  = SITES.filter(function(s){return s.live;}).length;
+  var alarms= Object.values(INFRA).reduce(function(a,b){return a+(b.alarms?b.alarms.length:0);},0);
+  var pending = SPARE_REQUESTS.filter(function(r){return r.status==='PENDING_IE'||r.status==='IE_APPROVED';}).length;
+  set('statsStrip',
+    statBox(total,'Total Sites','#0EA5E9')+
+    statBox(live,'Live','#16A34A')+
+    statBox(alarms,'Alarms','#DC2626')+
+    statBox(pending,'Pending Reqs','#D97706')
+  );
+}
+
+function statBox(val,lbl,col){
+  return '<div class="stat-box"><div class="stat-box-val" style="color:'+col+'">'+val+'</div><div class="stat-box-lbl">'+lbl+'</div></div>';
+}
+
+function filterSites(q){
+  APP.filterQ=q;
+  renderSiteList(q);
+}
+
+function renderSiteList(q){
+  q = (q||'').toLowerCase();
+  var sites = q ? SITES.filter(function(s){
+    return [s.id,s.name,s.circle,s.cluster].some(function(v){ return v.toLowerCase().includes(q); });
+  }) : SITES;
+
+  $('siteCount').textContent = sites.length+' sites';
+
+  if(!sites.length){
+    set('siteList','<div style="text-align:center;padding:40px;color:#94A3B8">No sites found for "'+h(q)+'"</div>');
+    return;
+  }
+
+  var html='';
+  sites.forEach(function(s,i){
+    var inf = INFRA[s.id];
+    var alarmCnt = inf&&inf.alarms?inf.alarms.length:0;
+    var dg = inf&&inf.dg;
+    var fuelLow = dg && dg.fuelOk && dg.fuel<=20;
+
+    html+='<div class="site-card '+(s.live?'live-border':'off-border')+'" style="animation-delay:'+(i*45)+'ms" onclick="openSite(\''+s.id+'\')">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+      +'<div style="display:flex;gap:11px;align-items:flex-start">'
+      +'<div style="background:'+(s.live?'rgba(22,163,74,.12)':'rgba(220,38,38,.1)')+';border-radius:10px;padding:9px;font-size:20px;flex-shrink:0">'
+      +(s.live?'📡':'📴')+'</div>'
+      +'<div>'
+      +'<div class="fw8 fs15" style="color:'+(s.live?'#0F172A':'#94A3B8')+';letter-spacing:-.3px">'+h(s.id)+'</div>'
+      +'<div class="fs12 fw6 ink2 mt" style="margin-top:2px">'+h(s.name)+'</div>'
+      +'<div style="display:flex;gap:8px;margin-top:5px;flex-wrap:wrap">'
+      +'<span class="fs11 ink2">📍 '+h(s.circle)+' › '+h(s.cluster)+'</span>'
+      +'<span class="fs11 ink2">👥 '+s.tenants+' tenants</span>'
+      +'</div>'
+      +'</div></div>'
+      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">'
+      +tag(s.live?'LIVE':'OFF-AIR', s.live?'#16A34A':'#DC2626', s.live?'#DCFCE7':'#FEE2E2')
+      +(alarmCnt?'<span class="tag" style="background:#FEE2E2;color:#DC2626">🔴 '+alarmCnt+' alarm'+(alarmCnt>1?'s':'')+'</span>':'')
+      +(fuelLow?'<span class="tag" style="background:#FEF3C7;color:#D97706">⚠ Low Fuel</span>':'')
+      +'</div></div>'
+      +'<div style="display:flex;gap:5px;margin-top:10px;flex-wrap:wrap">'
+      +s.ops.map(function(op){return tag(op,'#7C3AED');}).join('')
+      +(inf&&inf.dg?'<span style="margin-left:auto;font-size:10px;color:#94A3B8;font-weight:600">Next PM: '+h(inf.dg.nextPM)+'</span>':'')
+      +'</div>'
+      +'</div>';
+  });
+  set('siteList', html);
+}
+
+// ════════════════════════════════════════════════════════════════
+// SITE DETAIL
+// ════════════════════════════════════════════════════════════════
+function openSite(siteId){
+  APP.currentSite = siteId;
+  var site = SITES.find(function(s){return s.id===siteId;});
+  var inf  = INFRA[siteId];
+  hide('homePage'); $('sitePage').style.display='flex'; $('sitePage').style.flexDirection='column';
+
+  // Header
+  set('siteHeaderId', h(site.id));
+  set('siteHeaderName', h(site.name));
+  set('siteHeaderBadge', tag(site.live?'LIVE':'OFF-AIR', site.live?'#16A34A':'#DC2626', site.live?'#DCFCE7':'#FEE2E2'));
+
+  // GPS banner
+  var ci = APP.checkedIn[siteId];
+  var gpsB=$('gpsBanner');
+  gpsB.style.background=ci?'#DCFCE740':'#E0F2FE';
+  gpsB.style.border='1.5px solid '+(ci?'rgba(22,163,74,.3)':'rgba(14,165,233,.3)');
+  $('gpsCoords').textContent='Lat '+site.lat+' · Lng '+site.lng;
+  $('gpsTime').style.display=ci?'block':'none';
+  $('gpsTime').textContent='✓ Checked in at '+new Date(ci).toLocaleTimeString();
+  var gb=$('gpsBtn');
+  if(ci){ gb.textContent='Checked In ✓'; gb.className='btn btn-sm btn-green'; gb.disabled=true; }
+  else  { gb.textContent='Check In'; gb.className='btn btn-sm btn-sky'; gb.disabled=false; }
+
+  // Build tabs depending on infra available
+  var tabs=[
+    {id:'basic',  label:'Basic Info', icon:'ℹ️',  col:'#0EA5E9'},
+    {id:'dg',     label:'DG',         icon:'⛽',  col:'#D97706'},
+    {id:'battery',label:'Battery',    icon:'🔋',  col:'#16A34A'},
+    {id:'rect',   label:'Rectifier',  icon:'⚡',  col:'#7C3AED'},
+    {id:'eb',     label:'EB Supply',  icon:'🔌',  col:'#0D9488'},
+    {id:'alarms', label:'Alarms'+(inf&&inf.alarms&&inf.alarms.length?' ('+inf.alarms.length+')':''), icon:'🚨', col:'#DC2626'},
+    {id:'spares', label:'Spare Parts',icon:'🛠️', col:'#EA580C'},
+  ];
+
+  var tabHtml = tabs.map(function(t){
+    return '<button class="tab-btn '+(APP.currentTab===t.id?'active':'')+'" id="taббtn-'+t.id+'" data-tid="'+t.id+'" onclick="switchTab(\''+t.id+'\')" style="--tc:'+t.col+'">'+t.icon+' '+h(t.label)+'</button>';
+  }).join('');
+  set('tabStrip', tabHtml);
+
+  // Initial content
+  renderTabContent(APP.currentTab||'basic');
+}
+
+function doCheckIn(){
+  var siteId=APP.currentSite;
+  APP.checkedIn[siteId]=Date.now();
+  // Update banner
+  var site=SITES.find(function(s){return s.id===siteId;});
+  var gpsB=$('gpsBanner');
+  gpsB.style.background='#DCFCE740';
+  gpsB.style.border='1.5px solid rgba(22,163,74,.3)';
+  $('gpsTime').style.display='block';
+  $('gpsTime').textContent='✓ Checked in at '+new Date().toLocaleTimeString();
+  var gb=$('gpsBtn');
+  gb.textContent='Checked In ✓'; gb.className='btn btn-sm btn-green'; gb.disabled=true;
+  toast('GPS Check-in recorded at '+site.name, 'success');
+}
+
+function switchTab(tid){
+  APP.currentTab=tid;
+  document.querySelectorAll('.tab-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.tid===tid);
+  });
+  renderTabContent(tid);
+  // Scroll tab into view
+  var btn=document.querySelector('.tab-btn[data-tid="'+tid+'"]');
+  if(btn) btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+
+function renderTabContent(tid){
+  var inf=INFRA[APP.currentSite];
+  var site=SITES.find(function(s){return s.id===APP.currentSite;});
+  var html='<div class="tab-panel active" id="panel-'+tid+'">';
+
+  if(tid==='basic')   html+=buildBasic(site,inf);
+  else if(tid==='dg') html+=buildDG(inf.dg, inf);
+  else if(tid==='battery') html+=buildBattery(inf.bat);
+  else if(tid==='rect')    html+=buildRect(inf.rect);
+  else if(tid==='eb')      html+=buildEB(inf.eb);
+  else if(tid==='alarms')  html+=buildAlarms(inf);
+  else if(tid==='spares')  html+=buildSpares(APP.currentSite);
+
+  html+='</div>';
+  set('tabContent', html);
+}
+
+// ════════════════════════════════════════════════════════════════
+// TAB: BASIC INFO
+// ════════════════════════════════════════════════════════════════
+function buildBasic(site, inf){
+  var ci=APP.checkedIn[site.id];
+  return shdr('📋','Site Information','#0EA5E9')
+    +infoGrid([
+      {l:'Site ID',        v:h(site.id)},
+      {l:'Site Name',      v:h(site.name)},
+      {l:'Circle',         v:h(site.circle)},
+      {l:'Cluster',        v:h(site.cluster)},
+      {l:'Latitude',       v:h(site.lat)},
+      {l:'Longitude',      v:h(site.lng)},
+      {l:'Status',         v:tag(site.live?'LIVE':'OFF-AIR',site.live?'#16A34A':'#DC2626',site.live?'#DCFCE7':'#FEE2E2')},
+      {l:'Tenancies',      v:'<span class="fw7">'+site.tenants+'</span> tenants'},
+      {l:'Operators',      v:site.ops.map(function(o){return tag(o,'#7C3AED');}).join(' ')},
+      {l:'Power Source',   v:'<span class="fw7">'+h(inf.power)+'</span>'},
+      {l:'Solar',          v:tag(inf.solar,inf.solar==='Active'?'#EA580C':'#94A3B8',inf.solar==='Active'?'#FFEDD5':'#F1F5F9')},
+      {l:'Grid',           v:tag(inf.grid,inf.grid==='Available'?'#16A34A':'#DC2626',inf.grid==='Available'?'#DCFCE7':'#FEE2E2')},
+    ])
+    +'<div class="dvdr"></div>'
+    +shdr('📡','Operator Details','#7C3AED')
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
+    +site.ops.map(function(op){ return '<span style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;color:#7C3AED">'+h(op)+'</span>'; }).join('')
+    +'</div>'
+    +'<div class="dvdr"></div>'
+    +'<div class="alert-box mt8" style="background:#E0F2FE;border-color:#0EA5E9;color:#0369A1">'
+    +'<span style="font-size:18px">ℹ️</span>'
+    +'<span>Use the tabs above to view DG, Battery, Rectifier, EB and raise Spare Part requests.</span>'
+    +'</div>';
+}
+
+// ════════════════════════════════════════════════════════════════
+// TAB: DG
+// ════════════════════════════════════════════════════════════════
+function buildDG(dg, inf){
+  var col = !dg.fuelOk?'#94A3B8':dg.fuel<=20?'#DC2626':dg.fuel<=40?'#D97706':'#16A34A';
+  var bgc = !dg.fuelOk?'#F1F5F9':dg.fuel<=20?'#FEE2E2':dg.fuel<=40?'#FEF3C7':'#DCFCE7';
+
+  var html = shdr('⛽','DG Information','#D97706');
+  html += '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">'
+    +coBadge(dg.co)
+    +tag(dg.cap,'#0EA5E9','#E0F2FE')
+    +(!dg.fuelOk?'<span class="tag" style="background:#FEE2E2;color:#DC2626;animation:blink 1s infinite">⚠ SENSOR FAULT</span>':'')
+    +'</div>';
+
+  // DG mfg details
+  html += infoGrid([
+    {l:'DG Serial No',   v:'<code style="font-size:11px">'+h(dg.sn)+'</code>'},
+    {l:'Capacity',       v:'<span class="fw7">'+h(dg.cap)+'</span>'},
+    {l:'Tank Capacity',  v:'<span class="fw7">'+h(dg.tank)+'</span>'},
+    {l:'DG Battery Co',  v:coBadge(dg.battCo)},
+    {l:'DG Battery S/N', v:'<code style="font-size:10px">'+h(dg.battSn)+'</code>'},
+    {l:'Battery Cap',    v:'<span class="fw7">'+h(dg.battCap)+'</span>'},
+  ]);
+
+  html += '<div class="dvdr"></div>';
+  html += shdr('📅','Maintenance Schedule','#EA580C');
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
+    +'<div class="info-item" style="background:#FFEDD5;border:1.5px solid rgba(234,88,12,.25)">'
+    +'<div class="info-lbl" style="color:#EA580C">NEXT TOP-UP DATE</div>'
+    +'<div class="info-val fw8" style="color:#EA580C;font-size:14px">'+h(dg.nextTopup)+'</div>'
+    +'</div>'
+    +'<div class="info-item" style="background:#EDE9FE;border:1.5px solid rgba(124,58,237,.25)">'
+    +'<div class="info-lbl" style="color:#7C3AED">NEXT FULL PM DATE</div>'
+    +'<div class="info-val fw8" style="color:#7C3AED;font-size:14px">'+h(dg.nextPM)+'</div>'
+    +'</div>'
+    +'<div class="info-item" style="background:#F8FAFC">'
+    +'<div class="info-lbl">LAST PM DATE</div>'
+    +'<div class="info-val">'+h(dg.lastPM)+'</div>'
+    +'</div>'
+    +'<div class="info-item" style="background:#F8FAFC">'
+    +'<div class="info-lbl">HMR AT LAST PM</div>'
+    +'<div class="info-val">'+h(dg.hmr)+'</div>'
+    +'</div>'
+    +'</div>';
+
+  html += '<div class="dvdr"></div>';
+  html += shdr('📊','Live Status','#16A34A');
+
+  if(!dg.fuelOk){
+    html += '<div class="alert-box" style="background:#FEE2E2;border-color:#DC2626;color:#DC2626;margin-bottom:12px">'
+      +'<span style="font-size:20px">⚠️</span>'
+      +'<div><div class="fw8">Fuel Sensor Not Working</div><div style="font-weight:600;margin-top:2px">Manual inspection required immediately</div></div>'
+      +'</div>';
+  } else {
+    // Animated fuel display
+    html += '<div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:14px">'
+      // Tank
+      +'<div style="flex-shrink:0">'
+      +'<div style="width:14px;height:6px;background:'+col+';border-radius:3px 3px 0 0;margin:0 auto;opacity:.8"></div>'
+      +'<div class="tank-outer" style="width:60px;border:3px solid '+col+';box-shadow:0 0 12px '+col+'25">'
+      // tick marks
+      +[75,50,25].map(function(m){return '<div style="position:absolute;right:0;bottom:'+m+'%;width:10px;height:1px;background:#E2E8F0;z-index:3"><span style="position:absolute;right:2px;top:-7px;font-size:7px;color:#94A3B8">'+m+'</span></div>';}).join('')
+      +'<div class="tank-fill" style="height:'+dg.fuel+'%;background:linear-gradient(180deg,'+col+'30,'+col+'90 50%,'+col+'DD);--h:'+dg.fuel+'%">'
+      +'<div class="tank-wave" style="background:'+col+';opacity:.45"></div>'
+      +(dg.fuel>18?'<div class="tank-pct">'+dg.fuel+'%</div>':'')
+      +'</div>'
+      +'</div>'
+      +'<div style="width:8px;height:6px;background:#CBD5E1;border-radius:0 0 3px 3px;margin:0 auto"></div>'
+      +'<div style="text-align:center;margin-top:4px;font-size:11px;font-weight:800;color:'+col+'">'+dg.fuel+'%</div>'
+      +'</div>'
+      // Stats
+      +'<div style="flex:1">'
+      +'<div style="margin-bottom:8px">'
+      +'<div style="font-size:11px;font-weight:600;color:#334155;margin-bottom:4px">Tank Level</div>'
+      +'<div class="seg-bar">'
+      +Array.from({length:10}).map(function(_,i){
+        return '<div class="seg" style="background:'+(i<Math.round(dg.fuel/10)?col:'#E2E8F0')+';box-shadow:'+(i<Math.round(dg.fuel/10)?'0 0 4px '+col+'70':'none')+'"></div>';
+      }).join('')+'</div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:9px;color:#94A3B8"><span>0%</span><span style="font-weight:800;color:'+col+'">'+dg.fuel+'%</span><span>100%</span></div>'
+      +'</div>'
+      +'<div style="display:inline-flex;align-items:center;gap:6px;background:'+col+'12;border:1.5px solid '+col+'30;border-radius:9px;padding:6px 12px;margin-bottom:12px">'
+      +'<span class="led '+(dg.fuel<=20?'led-r':dg.fuel<=40?'led-y':'led-g')+'"></span>'
+      +'<span style="font-size:12px;font-weight:800;color:'+col+'">'+(dg.fuel<=20?'CRITICAL - Refuel Now':dg.fuel<=40?'Low - Schedule Refuel':'Normal')+'</span>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">'
+      +'<div style="background:#E0F2FE;border-radius:9px;padding:9px 11px"><div style="font-size:9px;color:#0369A1;font-weight:700;margin-bottom:3px">PRESENT kWH</div><div style="font-size:15px;font-weight:900;color:#0EA5E9">'+h(dg.kw)+'</div></div>'
+      +'<div style="background:#EDE9FE;border-radius:9px;padding:9px 11px"><div style="font-size:9px;color:#6D28D9;font-weight:700;margin-bottom:3px">HOUR METER (HMR)</div><div style="font-size:15px;font-weight:900;color:#7C3AED">'+h(dg.hmr)+'</div></div>'
+      +'</div>'
+      +'</div>'
+      +'</div>';
+  }
+
+  // Raise spare part request
+  var rm = ROLE_META[APP.user.role];
+  if(rm.canRaise){
+    html += '<div class="dvdr"></div>'
+      +shdr('🛠️','Spare Part Request','#EA580C')
+      +'<div class="alert-box mb12" style="background:#FEF3C7;border-color:#D97706;color:#92400E">'
+      +'<span>⚡</span><span>If any DG component needs replacement, raise a request below for approval.</span>'
+      +'</div>'
+      +'<button class="btn btn-orange btn-full" onclick="showSpareForm(\'dg\')" style="font-size:14px">'
+      +'🛠️ Raise DG Spare / Fault Request'
+      +'</button>';
+  }
+
+  return html;
+}
+
+// ════════════════════════════════════════════════════════════════
+// TAB: BATTERY
+// ════════════════════════════════════════════════════════════════
+function buildBattery(bat){
+  var faults = bat.working.filter(function(w){return !w;}).length;
+  var col = faults===0?'#16A34A':faults>=bat.cnt/2?'#DC2626':'#D97706';
+
+  var html = shdr('🔋','Battery Bank System','#16A34A');
+  html += '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">'
+    +coBadge(bat.co)
+    +tag(bat.cap,'#0EA5E9','#E0F2FE')
+    +tag(bat.cnt+' Banks','#334155','#F1F5F9')
+    +(faults?tag(faults+' FAULT','#DC2626','#FEE2E2'):'')
+    +'</div>';
+
+  // Health bar
+  html += '<div style="margin-bottom:14px">'
+    +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">'
+    +'<span class="fw6 ink2">Overall Bank Health</span>'
+    +'<span class="fw8" style="color:'+col+'">'+bat.health+'%</span>'
+    +'</div>'
+    +'<div style="height:10px;background:#F1F5F9;border-radius:99px;overflow:hidden">'
+    +'<div style="height:100%;width:'+bat.health+'%;background:linear-gradient(90deg,'+col+'70,'+col+');border-radius:99px;transition:width 1.2s ease;box-shadow:0 0 6px '+col+'50"></div>'
+    +'</div>'
+    +'</div>';
+
+  html += '<div style="font-size:11px;color:#94A3B8;margin-bottom:8px;font-weight:600">Tap any battery bank to view full details</div>';
+
+  // Battery grid
+  html += '<div class="bat-grid">';
+  bat.working.forEach(function(w,i){
+    var bc = !w?'#DC2626':bat.health>=80?'#16A34A':bat.health>=50?'#D97706':'#DC2626';
+    html += '<div class="bat-u" onclick="showBatDetail('+i+')" title="B'+(i+1)+': tap for details">'
+      +'<div class="bat-cap" style="background:'+bc+'"></div>'
+      +'<div class="bat-body" style="border:2.5px solid '+bc+';background:#F8FAFC;width:22px;height:40px">'
+      +'<div class="bat-fill" style="height:'+(w?bat.health:0)+'%;background:'+bc+'"></div>'
+      +(!w?'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(254,226,226,.85);font-size:10px;font-weight:900;color:#DC2626">✕</div>':'')
+      +'</div>'
+      +'<div class="bat-lbl" style="color:'+bc+'">B'+(i+1)+'<div style="color:'+(w?'#94A3B8':'#DC2626');+'">'+(w?bat.health+'%':'FAULT')+'</div></div>'
+      +'</div>';
+  });
+  html += '</div>';
+
+  // Legend
+  html += '<div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">'
+    +[{c:'#16A34A',l:'Healthy ≥80%'},{c:'#D97706',l:'Weak 50-79%'},{c:'#DC2626',l:'Critical/Fault'}].map(function(x){
+      return '<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#334155"><div style="width:9px;height:9px;border-radius:2px;background:'+x.c+'"></div>'+x.l+'</div>';
+    }).join('')
+    +'</div>';
+
+  if(faults){
+    html += '<div class="alert-box mt12" style="background:#FEE2E2;border-color:#DC2626;color:#DC2626">'
+      +'<span>🚨</span><span class="fw7">'+faults+' bank'+(faults>1?'s':'')+' in FAULT — Immediate inspection required!</span>'
+      +'</div>';
+  }
+
+  var rm=ROLE_META[APP.user.role];
+  if(rm.canRaise){
+    html += '<div class="dvdr"></div>'
+      +'<button class="btn btn-green btn-full" onclick="showSpareForm(\'battery\')">'
+      +'🛠️ Raise Battery Replacement Request'
+      +'</button>';
+  }
+
+  return html;
+}
+
+function showBatDetail(idx){
+  var inf = INFRA[APP.currentSite];
+  var bat = inf.bat;
+  var w = bat.working[idx];
+  var col = !w?'#DC2626':bat.health>=80?'#16A34A':bat.health>=50?'#D97706':'#DC2626';
+
+  showModal(
+    '<div class="modal-drag"></div>'
+    +'<div class="modal-header">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<div style="background:'+col+'18;border-radius:9px;padding:8px;font-size:20px">🔋</div>'
+    +'<div><div class="fw8 fs15">Battery Bank B'+(idx+1)+'</div>'
+    +'<div style="display:flex;align-items:center;gap:6px;margin-top:3px">'
+    +'<span class="led '+(w?bat.health>=80?'led-g':'led-y':'led-r')+'"></span>'
+    +'<span class="fw7 fs12" style="color:'+col+'">'+(w?'Health: '+bat.health+'%':'FAULT')+'</span>'
+    +'</div></div></div>'
+    +'<button class="modal-close" onclick="closeModal()">✕</button>'
+    +'</div>'
+    +'<div class="modal-body">'
+    +infoGrid([
+      {l:'Company',      v:coBadge(bat.co)},
+      {l:'Serial Number',v:'<code class="fs11">'+h(bat.serials[idx]||'N/A')+'</code>'},
+      {l:'Capacity',     v:'<span class="fw7">'+h(bat.cap)+'</span>'},
+      {l:'Bank No',      v:'<span class="fw7">B'+(idx+1)+' of '+bat.cnt+'</span>'},
+      {l:'Status',       v:w?tag('Operational','#16A34A','#DCFCE7'):tag('FAULT','#DC2626','#FEE2E2')},
+      {l:'Health',       v:w?('<span class="fw8" style="color:'+col+'">'+bat.health+'%</span>'):'—'},
+    ])
+    +'<div class="dvdr"></div>'
+    +'<div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px;background:#F8FAFC;border-radius:10px">'
+    +'<div style="position:relative;width:28px;height:54px">'
+    +'<div style="width:11px;height:5px;background:'+col+';border-radius:2px 2px 0 0;margin:0 auto"></div>'
+    +'<div style="width:28px;height:46px;border:2.5px solid '+col+';border-radius:3px 3px 6px 6px;overflow:hidden;background:#fff">'
+    +'<div style="position:absolute;bottom:0;left:0;right:0;height:'+(w?bat.health:0)+'%;background:'+col+';opacity:.9"></div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="fw7 fs13" style="color:'+col+'">'+(w?'In Service':'Needs Replacement')+'</div>'
+    +'</div>'
+    +'</div>'
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// TAB: RECTIFIER
+// ════════════════════════════════════════════════════════════════
+function buildRect(rect){
+  var faults = rect.working.filter(function(w){return !w;}).length;
+  var col = faults?'#DC2626':rect.load>85?'#EA580C':'#16A34A';
+
+  var html = shdr('⚡','Rectifier System','#7C3AED');
+  html += '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">'
+    +coBadge(rect.co)+tag(rect.model,'#0EA5E9','#E0F2FE')
+    +tag(rect.cnt+' Modules','#334155','#F1F5F9')
+    +(faults?tag(faults+' OFFLINE','#DC2626','#FEE2E2'):'')
+    +'</div>';
+
+  // Load bar
+  html += '<div style="margin-bottom:16px">'
+    +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">'
+    +'<span class="fw6 ink2">System Load</span>'
+    +'<span class="fw8" style="color:'+(rect.load>85?'#EA580C':'#16A34A')+'">'+rect.load+'%</span>'
+    +'</div>'
+    +'<div style="height:11px;background:#F1F5F9;border-radius:99px;overflow:hidden;position:relative">'
+    +'<div style="height:100%;width:'+rect.load+'%;border-radius:99px;background:'+(rect.load>85?'linear-gradient(90deg,#D97706,#EA580C)':'linear-gradient(90deg,#16A34A70,#16A34A)')+';transition:width 1.2s ease"></div>'
+    +'<div style="position:absolute;top:0;bottom:0;left:85%;width:2px;background:#DC2626;opacity:.5"></div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:space-between;margin-top:3px;font-size:9px;color:#94A3B8"><span>0%</span><span style="color:#DC2626">85% limit</span><span>100%</span></div>'
+    +'</div>';
+
+  html += '<div style="font-size:11px;color:#94A3B8;margin-bottom:8px;font-weight:600">Tap any module to view details</div>';
+
+  // Modules
+  html += '<div style="display:flex;gap:10px;flex-wrap:wrap">';
+  rect.working.forEach(function(w,i){
+    var mc = !w?'#DC2626':rect.load>85?'#EA580C':'#16A34A';
+    html += '<div class="rect-u" onclick="showRectDetail('+i+')" style="background:'+(w?(rect.load>85?'#FFEDD5':'#F8FAFC'):'#FEE2E2')+';border-color:'+mc+'40">'
+      +'<div class="rect-body" style="background:'+(w?'#fff':'rgba(220,38,38,.1)')+';border:2.5px solid '+mc+'">'
+      +'<div style="position:absolute;top:5px;right:6px;display:flex;flex-direction:column;gap:4px">'
+      +'<div style="width:5px;height:5px;border-radius:50%;background:'+(w?'#16A34A':'#E2E8F0')+'"></div>'
+      +'<div style="width:5px;height:5px;border-radius:50%;background:'+(w&&rect.load>60?(rect.load>85?'#EA580C':'#D97706'):'#E2E8F0')+'"></div>'
+      +'</div>'
+      +(w?'<div style="font-size:8px;font-weight:900;color:'+mc+';text-align:center;line-height:1.3">AC→DC<br><span style="font-size:7px;color:#94A3B8">48V</span></div>':'<div style="font-size:18px;font-weight:900;color:#DC2626">✕</div>')
+      +'</div>'
+      +'<div class="fw8 fs12" style="color:'+mc+'">R-'+(i+1)+'</div>'
+      +(w?'<div style="height:4px;background:#E2E8F0;border-radius:99px;overflow:hidden;margin-top:5px"><div style="height:100%;width:'+rect.load+'%;background:'+mc+'"></div></div><div style="font-size:9px;color:'+mc+';font-weight:700;margin-top:2px">'+rect.load+'%</div>':'')
+      +'<div class="tag mt8" style="background:'+mc+'18;color:'+mc+';font-size:9px">'+(w?(rect.load>85?'OVERLOAD':'NORMAL'):'OFFLINE')+'</div>'
+      +'</div>';
+  });
+  html += '</div>';
+
+  if(faults){
+    html += '<div class="alert-box mt12" style="background:#FEE2E2;border-color:#DC2626;color:#DC2626">'
+      +'<span>🚨</span><span class="fw7">'+faults+' module offline — Check fuse &amp; connections</span></div>';
+  }
+  if(rect.load>85&&!faults){
+    html += '<div class="alert-box mt12" style="background:#FFEDD5;border-color:#EA580C;color:#EA580C">'
+      +'<span>⚠️</span><span class="fw7">Load exceeds 85% — Add module or reduce load</span></div>';
+  }
+
+  var rm=ROLE_META[APP.user.role];
+  if(rm.canRaise){
+    html += '<div class="dvdr"></div>'
+      +'<button class="btn btn-full" style="background:#7C3AED;color:#fff" onclick="showSpareForm(\'rectifier\')">'
+      +'🛠️ Raise Rectifier Spare Request'
+      +'</button>';
+  }
+  return html;
+}
+
+function showRectDetail(idx){
+  var inf=INFRA[APP.currentSite];
+  var rect=inf.rect, w=rect.working[idx];
+  var col=!w?'#DC2626':rect.load>85?'#EA580C':'#16A34A';
+  showModal(
+    '<div class="modal-drag"></div>'
+    +'<div class="modal-header">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<div style="background:'+col+'18;border-radius:9px;padding:8px;font-size:20px">⚡</div>'
+    +'<div><div class="fw8 fs15">Rectifier R-'+(idx+1)+'</div>'
+    +'<div style="display:flex;align-items:center;gap:6px;margin-top:3px">'
+    +'<span class="led '+(w?(rect.load>85?'led-y':'led-g'):'led-r')+'"></span>'
+    +'<span class="fw7 fs12" style="color:'+col+'">'+(w?(rect.load>85?'OVERLOAD':'NORMAL'):'OFFLINE')+'</span>'
+    +'</div></div></div>'
+    +'<button class="modal-close" onclick="closeModal()">✕</button>'
+    +'</div>'
+    +'<div class="modal-body">'
+    +infoGrid([
+      {l:'Company',      v:coBadge(rect.co)},
+      {l:'Model',        v:'<span class="fw7">'+h(rect.model)+'</span>'},
+      {l:'Unit No',      v:'R-'+(idx+1)+' of '+rect.cnt},
+      {l:'Voltage',      v:'<span class="fw7">48V DC</span>'},
+      {l:'Load',         v:w?('<span class="fw8" style="color:'+col+'">'+rect.load+'%</span>'):'—'},
+      {l:'Status',       v:!w?tag('Offline','#DC2626','#FEE2E2'):rect.load>85?tag('Overload','#EA580C','#FFEDD5'):tag('Normal','#16A34A','#DCFCE7')},
+    ])
+    +(w?'<div class="dvdr"></div><div><div class="fs11 fw6 ink2 mb8">Load Meter</div>'
+    +'<div style="height:10px;background:#F1F5F9;border-radius:99px;overflow:hidden">'
+    +'<div style="height:100%;width:'+rect.load+'%;background:'+(rect.load>85?'linear-gradient(90deg,#D97706,#EA580C)':'linear-gradient(90deg,#16A34A70,#16A34A)')+';border-radius:99px"></div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:space-between;margin-top:3px;font-size:9px;color:#94A3B8"><span>0%</span><span style="color:#DC2626">85% limit</span><span>100%</span></div></div>'
+    :'<div class="alert-box mt12" style="background:#FEE2E2;border-color:#DC2626;color:#DC2626"><span>⛔</span><span>Module Offline — Replace or check fuse</span></div>')
+    +'</div>'
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// TAB: EB SUPPLY
+// ════════════════════════════════════════════════════════════════
+function buildEB(eb){
+  if(!eb||!eb.months||!eb.months.length){
+    return '<div style="text-align:center;padding:40px;color:#94A3B8">No EB data available</div>';
+  }
+
+  var html = shdr('🔌','EB Connection Details','#0D9488');
+  html += infoGrid([
+    {l:'Consumer No',       v:'<code class="fs11">'+h(eb.consumerNo)+'</code>'},
+    {l:'Tariff Category',   v:'<span class="fw7">'+h(eb.tariff)+'</span>'},
+    {l:'Sanctioned Load',   v:'<span class="fw7">'+h(eb.sanctionedLoad)+'</span>'},
+    {l:'Financial Year',    v:'<span class="fw7">Apr 2024 – Mar 2025</span>'},
+  ]);
+
+  html += '<div class="dvdr"></div>';
+
+  // Present month (first in array = most recent)
+  var pm = eb.months[0];
+  html += shdr('📅','Present Month — '+pm.mo,'#0D9488');
+  html += '<div style="background:'+(pm.paid?'linear-gradient(135deg,#DCFCE7,#CCFBF1)':'linear-gradient(135deg,#FEE2E2,#FEF3C7)')+';border:1.5px solid '+(pm.paid?'rgba(22,163,74,.3)':'rgba(220,38,38,.3)')+';border-radius:14px;overflow:hidden;margin-bottom:14px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.07);flex-wrap:wrap;gap:8px">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<div style="font-size:28px">'+(pm.paid?'✅':'⏳')+'</div>'
+    +'<div><div class="fw8 fs15">'+h(pm.mo)+'</div><div class="muted fs11">Bill No: '+h(pm.bill)+'</div></div>'
+    +'</div>'
+    +'<div style="text-align:right">'
+    +'<div class="fw9" style="font-size:20px;color:'+(pm.paid?'#16A34A':'#DC2626')+'">'+rs(pm.amount)+'</div>'
+    +tag(pm.paid?'PAID':'PENDING',pm.paid?'#16A34A':'#DC2626',pm.paid?'#DCFCE7':'#FEE2E2')
+    +'</div></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(0,0,0,.07)">'
+    +[
+      {l:'Opening Reading',v:pm.open.toLocaleString()+' kWh'},
+      {l:'Closing Reading', v:pm.close.toLocaleString()+' kWh'},
+      {l:'Units Consumed',  v:pm.units.toLocaleString()+' kWh'},
+      {l:'Rate per Unit',   v:'Rs.'+pm.rate+'/kWh'},
+      {l:'Amount',          v:rs(pm.amount)},
+      {l:pm.paid?'Paid On':'Due Date', v:pm.paid?pm.paidDt:'Pending'},
+    ].map(function(f){
+      return '<div style="background:rgba(255,255,255,.7);padding:10px 12px"><div style="font-size:9px;color:#94A3B8;font-weight:700;margin-bottom:3px">'+h(f.l)+'</div><div class="fw7 fs13">'+h(f.v)+'</div></div>';
+    }).join('')
+    +'</div></div>';
+
+  // Financial year summary
+  html += shdr('📊','Present Financial Year Summary (Apr 2024 – Mar 2025)','#0EA5E9');
+
+  var fyTotal  = eb.months.reduce(function(a,m){return a+m.amount;},0);
+  var fyUnits  = eb.months.reduce(function(a,m){return a+m.units;},0);
+  var fyPaid   = eb.months.filter(function(m){return m.paid;}).reduce(function(a,m){return a+m.amount;},0);
+  var fyPending= fyTotal - fyPaid;
+  var fyOpen   = eb.months[eb.months.length-1].open;   // oldest opening
+  var fyClose  = eb.months[0].close;                   // latest closing
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
+    +[
+      {l:'FY Opening Reading',  v:fyOpen.toLocaleString()+' kWh', col:'#0EA5E9', bg:'#E0F2FE'},
+      {l:'FY Closing Reading',  v:fyClose.toLocaleString()+' kWh',col:'#0D9488', bg:'#CCFBF1'},
+      {l:'Total Units Consumed',v:fyUnits.toLocaleString()+' kWh',col:'#7C3AED', bg:'#EDE9FE'},
+      {l:'Total FY Amount',     v:rs(fyTotal),                     col:'#334155', bg:'#F8FAFC'},
+      {l:'Total Paid',          v:rs(fyPaid),                      col:'#16A34A', bg:'#DCFCE7'},
+      {l:'Pending Amount',      v:rs(fyPending),                   col:fyPending?'#DC2626':'#16A34A', bg:fyPending?'#FEE2E2':'#DCFCE7'},
+    ].map(function(f){
+      return '<div style="background:'+f.bg+';border-radius:10px;padding:11px 12px">'
+        +'<div style="font-size:9px;color:'+f.col+';font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">'+h(f.l)+'</div>'
+        +'<div class="fw9" style="font-size:16px;color:'+f.col+'">'+h(f.v)+'</div>'
+        +'</div>';
+    }).join('')
+    +'</div>';
+
+  // Month-by-month table
+  html += shdr('📅','Month-wise EB Records','#334155');
+  html += '<div style="border:1px solid #E2E8F0;border-radius:12px;overflow:hidden">';
+  html += '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr 1.2fr;gap:0;background:#F8FAFC;padding:8px 12px;font-size:9px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:.5px">'
+    +'<span>MONTH</span><span>OPENING</span><span>CLOSING</span><span>UNITS</span><span>AMOUNT</span>'
+    +'</div>';
+  eb.months.forEach(function(m,i){
+    html += '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr 1.2fr;gap:0;padding:10px 12px;border-top:1px solid #F1F5F9;background:'+(i%2===0?'#fff':'#FAFAFA')+';align-items:center">'
+      +'<div><div class="fw7 fs12">'+h(m.mo)+'</div>'
+      +(m.paid?'<div style="font-size:10px;color:#16A34A;font-weight:600">✓ '+h(m.paidDt)+'</div>':'<div style="font-size:10px;color:#DC2626;font-weight:600">⏳ Pending</div>')
+      +'</div>'
+      +'<div class="fs12 fw6">'+m.open.toLocaleString()+'</div>'
+      +'<div class="fs12 fw6">'+m.close.toLocaleString()+'</div>'
+      +'<div class="fs12 fw7">'+m.units.toLocaleString()+'</div>'
+      +'<div class="fw8 fs13" style="color:'+(m.paid?'#16A34A':'#DC2626')+'">'+rs(m.amount)+'</div>'
+      +'</div>';
+  });
+  html += '</div>';
+
+  return html;
+}
+
+// ════════════════════════════════════════════════════════════════
+// TAB: ALARMS
+// ════════════════════════════════════════════════════════════════
+function buildAlarms(inf){
+  var alarms = inf.alarms||[];
+  if(!alarms.length){
+    return '<div style="text-align:center;padding:40px">'
+      +'<div style="font-size:48px;margin-bottom:12px">✅</div>'
+      +'<div class="fw8 fs16">All Clear</div>'
+      +'<div class="muted fs13 mt8">No active alarms on this site</div>'
+      +'</div>';
+  }
+
+  var html = shdr('🚨','Active Alarms ('+alarms.length+')','#DC2626');
+  html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">'
+    +tag(alarms.length+' Active','#DC2626','#FEE2E2')
+    +tag(new Date().toLocaleDateString(),'#94A3B8','#F1F5F9')
+    +'</div>';
+
+  alarms.forEach(function(a){
+    html += '<div class="alert-box mb12" style="background:#FEE2E2;border-color:#DC2626;color:#0F172A">'
+      +'<div style="font-size:20px;flex-shrink:0">🔴</div>'
+      +'<div>'
+      +'<div class="fw8 fs13" style="color:#DC2626">'+h(a)+'</div>'
+      +'<div class="fs11 muted" style="margin-top:2px">Auto-alert sent · '+new Date().toLocaleString()+'</div>'
+      +'</div></div>';
+  });
+
+  var rm=ROLE_META[APP.user.role];
+  if(rm.canRaise){
+    html += '<div class="dvdr"></div>'
+      +'<button class="btn btn-red btn-full" onclick="showSpareForm(\'alarm\')">'
+      +'🛠️ Raise Fault / Spare Request for Alarm'
+      +'</button>';
+  }
+  return html;
+}
+
+// ════════════════════════════════════════════════════════════════
+// TAB: SPARE PARTS
+// ════════════════════════════════════════════════════════════════
+function buildSpares(siteId){
+  var reqs = SPARE_REQUESTS.filter(function(r){return r.siteId===siteId;});
+  var rm = ROLE_META[APP.user.role];
+
+  var html = shdr('🛠️','Spare Part Requests','#EA580C');
+
+  // Approval role panel
+  if(rm.canApprove||rm.isStore){
+    html += '<div class="alert-box mb12" style="background:'+rm.bg+';border-color:'+rm.col+';color:'+rm.col+'">'
+      +'<span style="font-size:16px">👤</span>'
+      +'<div><div class="fw7">You are logged in as '+APP.user.role+'</div>'
+      +'<div class="fs11" style="margin-top:2px">'
+      +(ROLE_META[APP.user.role].approveLevel===1?'You can give IE (first) approval':
+        ROLE_META[APP.user.role].approveLevel===2?'You can give IL (second) approval':
+        'You can issue parts from store (final step)')
+      +'</div></div></div>';
+  }
+
+  // Raise new
+  if(rm.canRaise){
+    html += '<button class="btn btn-orange btn-full mb12" onclick="showSpareForm(\'general\')">'
+      +'+ Raise New Spare Part Request'
+      +'</button>';
+  }
+
+  if(!reqs.length){
+    html += '<div style="text-align:center;padding:32px;color:#94A3B8">'
+      +'<div style="font-size:36px;margin-bottom:8px">📦</div>'
+      +'<div class="fw7">No requests for this site yet</div>'
+      +'</div>';
+    return html;
+  }
+
+  reqs.forEach(function(req){
+    html += spareCard(req);
+  });
+
+  return html;
+}
+
+function spareCard(req){
+  var st = STATUS_FLOW[req.status]||STATUS_FLOW['PENDING_IE'];
+  var steps=[
+    {label:'Raised',     done:true,             col:'#0EA5E9',  name:req.raisedBy,  dt:req.dt},
+    {label:'IE Approval',done:req.status!=='PENDING_IE'&&req.status!=='REJECTED', col:'#7C3AED', name:req.ieBy,  dt:req.ieDt},
+    {label:'IL Approval',done:req.status==='IL_APPROVED'||req.status==='ISSUED',  col:'#D97706', name:req.ilBy,  dt:req.ilDt},
+    {label:'Parts Issued',done:req.status==='ISSUED',          col:'#16A34A',  name:req.storeBy,dt:req.storeDt},
+  ];
+  var activeStep = steps.findIndex(function(s){return !s.done;});
+
+  var rm=ROLE_META[APP.user.role];
+  var canAction=false;
+  if(rm.approveLevel===1&&req.status==='PENDING_IE') canAction='ie';
+  if(rm.approveLevel===2&&req.status==='IE_APPROVED') canAction='il';
+  if(rm.isStore&&req.status==='IL_APPROVED') canAction='store';
+
+  var html='<div class="req-card" style="border-color:'+(req.urgent?'rgba(220,38,38,.4)':'#E2E8F0')+'">'
+    +'<div class="req-head">'
+    +'<div style="flex:1;min-width:0">'
+    +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
+    +'<span class="fw8 fs13">'+h(req.id)+'</span>'
+    +(req.urgent?'<span class="tag" style="background:#FEE2E2;color:#DC2626;animation:blink 1.5s infinite">🔴 URGENT</span>':'')
+    +'</div>'
+    +'<div class="fw7 fs12 ink2 ellipsis">'+h(req.part)+'</div>'
+    +'<div class="muted fs11 mt">Qty: '+req.qty+' · '+h(req.dt)+'</div>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">'
+    +'<span class="tag" style="background:'+st.bg+';color:'+st.col+'">'+h(st.label)+'</span>'
+    +'</div></div>'
+    +'<div class="req-body">'
+    +'<div class="muted fs11 mb8">Reason: '+h(req.reason)+'</div>'
+    +'<div class="muted fs11 mb8">Raised by: <span class="fw7 ink2">'+h(req.raisedBy)+'</span> ('+h(req.raisedRole)+')</div>'
+    // Approval flow
+    +'<div class="flow-steps">';
+  steps.forEach(function(s,i){
+    html += '<div class="flow-step">'
+      +'<div class="flow-circle '+(s.done?'done':i===activeStep?'active':'')+'" style="--col:'+s.col+';">'
+      +(s.done?'<span style="color:#fff;font-size:14px">✓</span>':'<span style="font-size:11px;color:#94A3B8">'+(i+1)+'</span>')
+      +'</div>'
+      +'<div class="flow-step-lbl" style="color:'+(s.done?s.col:i===activeStep?'#0EA5E9':'#94A3B8')+'">'+h(s.label)+'</div>'
+      +(s.done&&s.name?'<div style="font-size:8px;color:#94A3B8;text-align:center;max-width:48px">'+h(s.name)+'</div>':'')
+      +'</div>'
+      +(i<steps.length-1?'<div class="flow-line '+(s.done?'done':'')+'"></div>':'');
+  });
+  html += '</div>';
+
+  // Action buttons
+  if(canAction){
+    html += '<div class="mt12">';
+    if(canAction==='ie'){
+      html += '<button class="btn btn-full mb8" style="background:#7C3AED;color:#fff" onclick="approveRequest(\''+req.id+'\',\'ie\')">✓ Give IE Approval</button>'
+        +'<button class="btn btn-out btn-full btn-sm" onclick="rejectRequest(\''+req.id+'\')">✕ Reject Request</button>';
+    } else if(canAction==='il'){
+      html += '<button class="btn btn-full mb8" style="background:#D97706;color:#fff" onclick="approveRequest(\''+req.id+'\',\'il\')">✓ Give IL Approval</button>'
+        +'<button class="btn btn-out btn-full btn-sm" onclick="rejectRequest(\''+req.id+'\')">✕ Reject</button>';
+    } else if(canAction==='store'){
+      html += '<button class="btn btn-green btn-full" onclick="approveRequest(\''+req.id+'\',\'store\')">📦 Issue Parts from Store</button>';
+    }
+    html += '</div>';
+  }
+
+  html += '</div></div>';
+  return html;
+}
+
+function approveRequest(id, level){
+  var req = SPARE_REQUESTS.find(function(r){return r.id===id;});
+  if(!req) return;
+  var now = new Date().toLocaleDateString();
+  if(level==='ie')    { req.status='IE_APPROVED'; req.ieBy=APP.user.name; req.ieDt=now; }
+  if(level==='il')    { req.status='IL_APPROVED'; req.ilBy=APP.user.name; req.ilDt=now; }
+  if(level==='store') { req.status='ISSUED'; req.storeBy=APP.user.name; req.storeDt=now; }
+  toast((level==='store'?'Parts issued from store!':'Approval given by '+APP.user.role), 'success');
+  renderTabContent('spares');
+}
+
+function rejectRequest(id){
+  var req=SPARE_REQUESTS.find(function(r){return r.id===id;});
+  if(req){ req.status='REJECTED'; toast('Request rejected.','warn'); renderTabContent('spares'); }
+}
+
+// ════════════════════════════════════════════════════════════════
+// SPARE PART REQUEST FORM
+// ════════════════════════════════════════════════════════════════
+function showSpareForm(context){
+  var contextLabels={'dg':'DG Component','battery':'Battery Bank','rectifier':'Rectifier Module','alarm':'Fault / Alarm','general':'General'};
+  var lbl = contextLabels[context]||'General';
+  showModal(
+    '<div class="modal-drag"></div>'
+    +'<div class="modal-header">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<div style="background:#FFEDD5;border-radius:9px;padding:8px;font-size:20px">🛠️</div>'
+    +'<div><div class="fw8 fs15">Spare Part Request</div><div class="muted fs11">'+h(lbl)+' · '+h(APP.currentSite)+'</div></div>'
+    +'</div>'
+    +'<button class="modal-close" onclick="closeModal()">✕</button>'
+    +'</div>'
+    +'<div class="modal-body">'
+    // Approval flow info
+    +'<div class="alert-box mb12" style="background:#EDE9FE;border-color:#7C3AED;color:#5B21B6">'
+    +'<span>📋</span>'
+    +'<div class="fs11"><div class="fw7 mb">Approval Flow:</div>'
+    +'<div>You (Raise) → IE Approval → IL Approval → JC Store (Issue)</div></div>'
+    +'</div>'
+    +'<div class="mb12">'
+    +'<label class="fs11 fw7 ink2" style="display:block;margin-bottom:6px">Part / Component Name *</label>'
+    +'<input id="spPart" class="inp" placeholder="e.g. Rectifier Module Eltek 48V 30A" style="font-size:14px"/>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'
+    +'<div><label class="fs11 fw7 ink2" style="display:block;margin-bottom:6px">Quantity *</label>'
+    +'<input id="spQty" class="inp" type="number" min="1" value="1" style="font-size:14px"/></div>'
+    +'<div><label class="fs11 fw7 ink2" style="display:block;margin-bottom:6px">Priority</label>'
+    +'<select id="spPrio" class="sel"><option value="normal">Normal</option><option value="urgent">URGENT</option></select></div>'
+    +'</div>'
+    +'<div class="mb12">'
+    +'<label class="fs11 fw7 ink2" style="display:block;margin-bottom:6px">Fault Description / Reason *</label>'
+    +'<textarea id="spReason" class="inp" rows="3" placeholder="Describe the fault or reason for replacement..." style="resize:none;font-size:13px"></textarea>'
+    +'</div>'
+    +'<div class="mb12" style="display:flex;align-items:center;justify-content:space-between;background:#F8FAFC;border-radius:9px;padding:10px 13px">'
+    +'<div class="fs12 ink2">📸 Photo evidence</div>'
+    +'<button class="btn btn-out btn-sm">Attach Photo</button>'
+    +'</div>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;background:#F8FAFC;border-radius:9px;padding:10px 13px;margin-bottom:16px">'
+    +'<div class="fs12 ink2">📍 GPS Location</div>'
+    +'<span class="tag" style="background:#DCFCE7;color:#16A34A">Auto-captured</span>'
+    +'</div>'
+    +'<button class="btn btn-orange btn-full" style="height:44px;font-size:15px" onclick="submitSpareRequest(\''+context+'\')">'
+    +'🛠️ Submit Request for Approval'
+    +'</button>'
+    +'</div>'
+  );
+}
+
+function submitSpareRequest(context){
+  var part    = document.getElementById('spPart').value.trim();
+  var qty     = parseInt(document.getElementById('spQty').value)||1;
+  var reason  = document.getElementById('spReason').value.trim();
+  var urgent  = document.getElementById('spPrio').value==='urgent';
+
+  if(!part||!reason){
+    toast('Please fill in part name and reason','error');
+    return;
+  }
+
+  var newReq={
+    id:'SPR-'+(100+SPARE_REQUESTS.length+1),
+    siteId: APP.currentSite,
+    part: part, qty: qty, reason: reason,
+    raisedBy: APP.user.name, raisedRole: APP.user.role,
+    dt: new Date().toLocaleDateString(),
+    status:'PENDING_IE',
+    ieBy:null,ieDt:null,ilBy:null,ilDt:null,storeBy:null,storeDt:null,
+    urgent: urgent,
+  };
+  SPARE_REQUESTS.push(newReq);
+  closeModal();
+  toast('Request '+newReq.id+' submitted! Awaiting IE approval.','success');
+  renderStats();
+  // Stay on current tab or switch to spares
+  if(APP.currentTab==='spares') renderTabContent('spares');
+}
+
+// ════════════════════════════════════════════════════════════════
+// NOTIFICATIONS (sample)
+// ════════════════════════════════════════════════════════════════
+var notifOpen=false;
+function toggleNotif(){
+  notifOpen=!notifOpen;
+  var nb=$('notifBtn');
+  if(notifOpen){
+    showModal(
+      '<div class="modal-drag"></div>'
+      +'<div class="modal-header"><span class="fw8 fs15">🔔 Notifications</span><button class="modal-close" onclick="closeModal()">✕</button></div>'
+      +'<div class="modal-body">'
+      +[
+        {t:'DG Fuel critical — KABLR0987 (18%)',  c:'#DC2626',bg:'#FEE2E2', dt:'2 min ago'},
+        {t:'Battery fault — TNCHE0011 Bank B6',    c:'#D97706',bg:'#FEF3C7', dt:'15 min ago'},
+        {t:'Spare request SPR-001 — IE Approved',  c:'#7C3AED',bg:'#EDE9FE', dt:'1 hr ago'},
+        {t:'PM Due: KABLR0987 — Next PM 20 May',   c:'#0D9488',bg:'#CCFBF1', dt:'2 hrs ago'},
+      ].map(function(n,i){
+        return '<div style="background:'+n.bg+';border:1px solid '+n.c+'25;border-left:3px solid '+n.c+';border-radius:10px;padding:11px 13px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
+          +'<div class="fw6 fs13" style="color:#0F172A">'+h(n.t)+'</div>'
+          +'<div class="muted fs10 fw6" style="white-space:nowrap">'+n.dt+'</div>'
+          +'</div>';
+      }).join('')
+      +'<button class="btn btn-out btn-full btn-sm mt12" onclick="closeModal()">Dismiss All</button>'
+      +'</div>'
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════
+// Close modals on back-button style interaction
+window.addEventListener('keydown',function(e){
+  if(e.key==='Escape') closeModal();
+});
+</script>
+</body>
+</html>
