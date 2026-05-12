@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Telecom O&M - Field Operations</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%}
+body{font-family:'Poppins',sans-serif;background:#F1F5F9;color:#0F172A;min-height:100vh;overflow-x:hidden}
+input,textarea,select,button{font-family:'Poppins',sans-serif;font-size:inherit}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes glow{0%,100%{box-shadow:0 0 4px currentColor}50%{box-shadow:0 0 14px currentColor}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+.fw9{font-weight:900}.fw8{font-weight:800}.fw7{font-weight:700}.fw6{font-weight:600}
+.fs10{font-size:10px}.fs11{font-size:11px}.fs12{font-size:12px}.fs13{font-size:13px}.fs14{font-size:14px}
+.muted{color:#94A3B8}.ink2{color:#334155}
+
+.btn{display:inline-flex;align-items:center;gap:6px;font-weight:700;border-radius:9px;border:none;cursor:pointer;transition:all 0.15s;white-space:nowrap;font-size:13px;padding:9px 16px}
+.btn-sky{background:#0EA5E9;color:#fff}
+.btn-green{background:#16A34A;color:#fff}
+.btn-out{background:#fff;color:#334155;border:1.5px solid #E2E8F0}
+.btn-sm{padding:5px 11px!important;font-size:11px!important}
+.btn-full{width:100%;justify-content:center}
+.btn:disabled{opacity:0.45}
+
+.inp{width:100%;background:#fff;border:1.5px solid #E2E8F0;border-radius:9px;padding:10px 13px;font-size:14px;color:#0F172A;outline:none}
+.inp:focus{border-color:#0EA5E9;box-shadow:0 0 0 3px rgba(14,165,233,0.1)}
+
+.tag{border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;display:inline-block}
+.led{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.led-g{background:#16A34A;animation:glow 2s infinite}
+.led-r{background:#DC2626;animation:blink 0.8s infinite}
+.led-y{background:#D97706;animation:pulse 1.5s infinite}
+
+.shdr{font-size:11px;font-weight:800;letter-spacing:1.2px;color:#94A3B8;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.dvdr{height:1px;background:#F1F5F9;margin:12px 0}
+
+#loginPage{min-height:100vh;background:linear-gradient(150deg,#0F172A 0%,#1e3a5f 45%,#0D9488 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-wrap{width:100%;max-width:400px}
+.login-logo-ring{width:72px;height:72px;background:rgba(56,189,248,0.15);border:2px solid rgba(56,189,248,0.35);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;animation:bounce 2.5s ease-in-out infinite}
+.login-card{background:rgba(255,255,255,0.97);border-radius:20px;padding:28px;box-shadow:0 24px 64px rgba(0,0,0,0.45)}
+.login-err{background:#FEE2E2;border:1px solid #FCA5A5;border-radius:9px;padding:10px 13px;margin-bottom:14px;font-size:12px;font-weight:700;color:#DC2626;display:none;align-items:center;gap:8px}
+
+#topNav{background:#fff;border-bottom:1px solid #E2E8F0;height:54px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.nav-brand{display:flex;align-items:center;gap:8px}
+.nav-icon{width:34px;height:34px;background:#E0F2FE;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.role-badge{display:flex;align-items:center;gap:6px;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;border:1.5px solid transparent}
+
+#homePage{padding:16px}
+.search-hero{background:linear-gradient(135deg,#0F172A,#1e3a5f);border-radius:16px;padding:20px;margin-bottom:16px}
+.search-hero-title{color:#fff;font-size:17px;font-weight:800;margin-bottom:4px}
+.search-box input{width:100%;background:rgba(255,255,255,0.95);border:none;border-radius:10px;padding:11px 16px 11px 40px;font-size:14px}
+
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.stat-box{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:10px;text-align:center}
+.stat-box-val{font-size:22px;font-weight:900}
+.stat-box-lbl{font-size:9px;color:#94A3B8;font-weight:800;margin-top:2px;text-transform:uppercase}
+
+.section-title{font-size:13px;font-weight:800;color:#334155;margin-bottom:10px}
+
+.site-card{background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;animation:fadeUp 0.35s cubic-bezier(0.34,1.2,0.64,1) both}
+
+#sitePage{display:none;flex-direction:column;min-height:100vh}
+.site-header{background:#fff;border-bottom:1px solid #E2E8F0;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.back-btn{width:34px;height:34px;border-radius:8px;background:#F1F5F9;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px}
+
+.tab-strip-wrap{background:#fff;border-bottom:2px solid #F1F5F9;position:sticky;top:54px;z-index:100}
+.tab-strip{display:flex;overflow-x:auto;padding:0 16px;gap:2px;-webkit-overflow-scrolling:touch}
+.tab-strip::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:12px 14px;background:0;border:none;cursor:pointer;font-size:12px;font-weight:700;color:#94A3B8;border-bottom:2.5px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tab-btn.active{color:#0EA5E9;border-bottom-color:#0EA5E9}
+.tab-panel{display:none;padding:16px}
+.tab-panel.active{display:block}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-item{background:#F8FAFC;border-radius:10px;padding:10px 12px}
+.info-lbl{font-size:10px;color:#94A3B8;font-weight:800;text-transform:uppercase;margin-bottom:3px}
+.info-val{font-size:13px;font-weight:700;color:#0F172A}
+
+.owner-card{background:#fff;border:1.5px solid #E0F2FE;border-radius:12px;padding:14px;margin-bottom:10px}
+.owner-card-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.owner-avatar{width:40px;height:40px;background:linear-gradient(135deg,#0EA5E9,#0D9488);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:900}
+.owner-info{flex:1;min-width:0}
+.owner-name{font-size:13px;font-weight:800;color:#0F172A}
+.owner-role{font-size:10px;color:#94A3B8;font-weight:700;text-transform:uppercase;margin-top:2px}
+.owner-details{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:10px;border-top:1px solid #E2E8F0}
+.owner-detail-item{font-size:11px}
+.owner-detail-lbl{color:#94A3B8;font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.owner-detail-val{color:#0F172A;font-weight:700;word-break:break-word}
+
+.bat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px;background:#F8FAFC;border-radius:10px;border:1px solid #E2E8F0}
+.bat-u{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px;border-radius:9px;background:#fff;border:1.5px solid #E2E8F0;transition:all 0.2s}
+.bat-u:active{transform:scale(0.95)}
+.bat-body{width:28px;height:48px;border-radius:3px 3px 6px 6px;overflow:hidden;position:relative;border:2px solid}
+.bat-fill{position:absolute;bottom:0;left:0;right:0;transition:height 0.9s ease;opacity:0.9}
+.bat-cap{width:12px;height:5px;border-radius:2px 2px 0 0;margin:0 auto}
+.bat-lbl{font-size:10px;font-weight:800;text-align:center;line-height:1.2}
+
+.solar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px;background:#F8FAFC;border-radius:10px;border:1px solid #E2E8F0;margin-bottom:14px}
+.solar-panel{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:10px;border-radius:9px;background:#fff;border:1.5px solid #E2E8F0;transition:all 0.2s;text-align:center}
+.solar-panel:active{transform:scale(0.95)}
+.solar-body{width:45px;height:50px;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;border:2px solid;background:linear-gradient(135deg,rgba(250,204,21,0.3),rgba(251,146,60,0.3))}
+.solar-rays{position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;animation:pulse 2s infinite}
+.solar-lbl{font-size:10px;font-weight:800;line-height:1.2}
+
+.bill-card{background:#fff;border:1.5px solid #E0F2FE;border-radius:12px;padding:12px;margin-bottom:10px}
+.bill-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.bill-card-title{font-size:13px;font-weight:800;color:#0F172A}
+.bill-card-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700}
+.bill-table{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;background:#F8FAFC;border-radius:9px;border-left:3px solid #0EA5E9}
+.bill-table-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:11px}
+.bill-table-row-label{color:#94A3B8;font-weight:700}
+.bill-table-row-value{color:#0F172A;font-weight:800}
+
+.rect-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.rect-u{background:#fff;border:1.5px solid #E2E8F0;border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s;text-align:center}
+.rect-u:active{transform:scale(0.98)}
+.rect-body{width:50px;height:40px;margin:0 auto 8px;border-radius:7px;display:flex;align-items:center;justify-content:center;position:relative;border:2px solid}
+
+.pm-checklist{background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;margin-bottom:14px}
+.pm-check-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid #F1F5F9}
+.pm-check-box{width:18px;height:18px;border:2px solid #E2E8F0;border-radius:4px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.pm-check-box.checked{background:#16A34A;border-color:#16A34A}
+.pm-check-label{flex:1;font-size:12px;font-weight:600;color:#334155}
+.pm-sub-items{background:#F8FAFC;border-radius:8px;padding:8px 12px;margin-top:6px;border-left:3px solid #0EA5E9}
+.pm-sub-item{display:flex;align-items:center;gap:6px;font-size:11px;color:#334155;margin-bottom:4px}
+.pm-sub-item:last-child{margin-bottom:0}
+.pm-sub-item input{width:16px;height:16px;cursor:pointer;accent-color:#16A34A}
+
+.photo-upload-section{background:#E0F2FE;border:2px dashed #0EA5E9;border-radius:10px;padding:12px;margin-top:8px;text-align:center;cursor:pointer;transition:all 0.2s}
+.photo-upload-section:hover{background:#CCFBF1;border-color:#0D9488}
+.photo-upload-section.dragover{background:#DCFCE7;border-color:#16A34A}
+.photo-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.photo-item{background:#fff;border:1px solid #0EA5E9;border-radius:8px;padding:6px 10px;font-size:10px;color:#0369A1;font-weight:700;display:flex;align-items:center;gap:6px}
+.photo-item-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.photo-item-close{cursor:pointer;font-weight:900;color:#DC2626}
+.photo-input{display:none}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:600;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn 0.2s ease}
+.modal-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1) both}
+.modal-drag{width:36px;height:4px;background:#E2E8F0;border-radius:99px;margin:12px auto 6px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #F1F5F9}
+.modal-close{width:30px;height:30px;border-radius:8px;background:#F1F5F9;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
+.modal-body{padding:16px 18px}
+
+.alert-box{border-radius:10px;padding:10px 13px;border-left:3px solid;display:flex;align-items:flex-start;gap:8px;font-size:12px;font-weight:600;margin-bottom:8px}
+
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}
+.ellipsis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+</head>
+<body>
+
+<div id="loginPage">
+  <div class="login-wrap">
+    <div style="text-align:center;margin-bottom:32px">
+      <div class="login-logo-ring">🔧</div>
+      <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px">Telecom O&M</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:4px">Field Operations</div>
+    </div>
+    <div class="login-card">
+      <div class="fw9" style="font-size:19px;margin-bottom:4px">Welcome</div>
+      <div class="ink2" style="font-size:13px;margin-bottom:16px">Sign in</div>
+      <div class="login-err" id="lErr"><span>⚠</span><span id="lErrMsg"></span></div>
+      <div class="mb12">
+        <label class="fs11 fw8 ink2" style="display:block;margin-bottom:6px">EMAIL</label>
+        <input id="lEmail" class="inp" type="email" placeholder="you@telecom.com" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div style="margin-bottom:20px">
+        <label class="fs11 fw8 ink2" style="display:block;margin-bottom:6px">PASSWORD</label>
+        <input id="lPw" class="inp" type="password" placeholder="password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button id="lBtn" class="btn btn-sky btn-full" onclick="doLogin()" style="height:44px;font-size:15px;border-radius:11px;background:linear-gradient(135deg,#0EA5E9,#0D9488);font-weight:800">SIGN IN</button>
+      <div style="margin-top:14px;font-size:11px;color:#94A3B8;text-align:center">Demo: <b>tech@telecom.com</b> / <b>tech123</b></div>
+    </div>
+  </div>
+</div>
+
+<div id="appShell" style="display:none;flex-direction:column;min-height:100vh">
+  <div id="topNav">
+    <div class="nav-brand">
+      <div class="nav-icon">🔧</div>
+      <div><div class="fw9 fs14">Telecom O&M</div></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div id="roleBadge" class="role-badge"></div>
+      <button class="btn btn-out btn-sm" onclick="doLogout()">Exit</button>
+    </div>
+  </div>
+
+  <div id="homePage">
+    <div class="search-hero">
+      <div class="search-hero-title">Field Ops Dashboard</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:14px">Search or tap a site</div>
+      <div class="search-box" style="position:relative">
+        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none">🔍</span>
+        <input id="siteSearch" type="text" placeholder="Search site…" oninput="filterSites(this.value)">
+      </div>
+    </div>
+    <div class="stat-strip" id="statsStrip"></div>
+    <div class="section-title">SITES</div>
+    <div id="siteList"></div>
+  </div>
+
+  <div id="sitePage">
+    <div class="site-header">
+      <div class="back-btn" onclick="goHome()">←</div>
+      <div style="flex:1;min-width:0">
+        <div class="fw8 fs14 ellipsis" id="siteHeaderId"></div>
+        <div class="muted fs11 ellipsis" id="siteHeaderName"></div>
+      </div>
+    </div>
+    <div style="padding:10px 16px 0">
+      <div style="background:#E0F2FE;border:1.5px solid rgba(14,165,233,0.3);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="font-size:22px">📍</div>
+          <div><div class="fw8 fs13">GPS Check-in</div><div class="muted fs11" id="gpsCoords"></div></div>
+        </div>
+        <button class="btn btn-sm btn-sky" id="gpsBtn" onclick="doCheckIn()">Check In</button>
+      </div>
+    </div>
+    <div class="tab-strip-wrap">
+      <div class="tab-strip" id="tabStrip"></div>
+    </div>
+    <div id="tabContent"></div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+'use strict';
+
+var USERS=[{email:'tech@telecom.com',pw:'tech123',role:'Technician',name:'Arjun Sharma'},{email:'ie@telecom.com',pw:'ie123',role:'IE',name:'Priya Mehta'}];
+var ROLE_META={'Technician':{col:'#0EA5E9',bg:'#E0F2FE'},'IE':{col:'#7C3AED',bg:'#EDE9FE'}};
+var SITES=[{id:'APHYD2345',name:'Hyderabad Central',circle:'AP',cluster:'HYD-NORTH',lat:'17.3850',lng:'78.4867',live:true,tenants:3,owners:[{name:'Rajesh Kumar',role:'Site Owner',phone:'+91-9876543210',address:'Plot 123, Tech Park, Hyderabad 500001',email:'rajesh@sitetech.com'},{name:'Pradeep Singh',role:'Landlord',phone:'+91-9988776655',address:'Apt 45, Commercial Complex, Hyderabad 500002',email:'pradeep@landlord.com'},{name:'Ananya Patel',role:'Facility Manager',phone:'+91-8765432109',address:'Office 12, Business Hub, Hyderabad 500003',email:'ananya@facilities.com'}]},{id:'MHPUN1122',name:'Pune West BTS',circle:'MH',cluster:'PUNE-WEST',lat:'18.5204',lng:'73.8567',live:true,tenants:2,owners:[{name:'Vikram Desai',role:'Site Owner',phone:'+91-9755664433',address:'Building B, Industrial Area, Pune 411001',email:'vikram@sitetech.com'},{name:'Meera Sharma',role:'Landlord',phone:'+91-8899776655',address:'Sector 12, Commercial Zone, Pune 411002',email:'meera@landlord.com'}]},{id:'KABLR0987',name:'Bangalore Tech',circle:'KA',cluster:'BLR-EAST',lat:'12.9716',lng:'77.5946',live:false,tenants:4,owners:[{name:'Arjun Reddy',role:'Site Owner',phone:'+91-9912345678',address:'Tech Tower, Outer Ring Road, Bangalore 560001',email:'arjun@sitetech.com'},{name:'Sneha Nair',role:'Landlord',phone:'+91-8877665544',address:'Plaza 7, IT Park, Bangalore 560002',email:'sneha@landlord.com'},{name:'Rohan Das',role:'Operations',phone:'+91-9988334455',address:'Office Space 5, Commerce St, Bangalore 560003',email:'rohan@operations.com'},{name:'Pooja Singh',role:'Tenant Rep',phone:'+91-8899001122',address:'Suite 22, Business Park, Bangalore 560004',email:'pooja@tenant.com'}]}];
+
+var INFRA={
+  'APHYD2345':{dg:{co:'Cummins',sn:'CUM-2020-HYD-4521',cap:'125 kVA',tank:'250 L',fuel:72,nextTopup:'12 May 2025',nextPM:'01 Jun 2025',lastFill:{kw:4521,hmr:1240,dt:'08 Apr 2025 14:30'}},bat:{co:'Exide',cap:'2V / 1000Ah VRLA',cnt:8,health:85,working:[1,1,1,1,1,1,1,0],serials:['EX-001','EX-002','EX-003','EX-004','EX-005','EX-006','EX-007','EX-008']},rect:{cnt:2,models:['Eltek Flatpack','Eltek Flatpack'],load:68,working:[1,1]},eb:{consumer:'TSEB-HYD-4521',tariff:'HT-II Commercial',sanctioned:'25 kW',currentReading:16890,previousReading:14230,currentDate:'12 May 2025',bills:[{month:'May 2025',opening:14230,closing:16890,units:2660,rate:7.5,amount:19950,paid:false,dueDate:'20 May 2025'},{month:'Apr 2025',opening:11520,closing:14230,units:2710,rate:7.5,amount:20325,paid:true,paidDate:'08 Apr 2025'}]},solar:{panels:12,working:[1,1,1,1,1,0,1,1,1,1,1,0],capacity:'4 kW',production:3200,health:88,serials:['SP-001','SP-002','SP-003','SP-004','SP-005','SP-006','SP-007','SP-008','SP-009','SP-010','SP-011','SP-012']},pmChecks:[{no:1,point:'Visual Inspection',criteria:'No leakage',items:['Engine body clean','No abnormal noise','Fuel tank intact']},{no:2,point:'Battery Bank',criteria:'Health check',items:['All connections tight','No corrosion','Health reading OK']},{no:3,point:'DG Oil & Filter',criteria:'Proper level',items:['Oil level checked','Filter condition OK','Oil color normal']},{no:4,point:'Electrical',criteria:'No loose wiring',items:['Terminal connections tight','No burnt marks','Ground proper']},{no:5,point:'Fuel System',criteria:'No leaks',items:['Fuel filter clean','Tank clean','Pump working']}],alarms:['Low fuel warning']},
+  'MHPUN1122':{dg:{co:'Kirloskar',sn:'KG-2019-PUN-1122',cap:'62.5 kVA',tank:'140 L',fuel:0,nextTopup:'N/A',nextPM:'15 Jun 2025',lastFill:{kw:2198,hmr:450,dt:'05 Apr 2025 10:15'}},bat:{co:'Amara Raja',cap:'2V / 500Ah VRLA',cnt:4,health:92,working:[1,1,1,1],serials:['AR-101','AR-102','AR-103','AR-104']},rect:{cnt:1,models:['Vertiv NetSure'],load:45,working:[1]},eb:{consumer:'MSEB-PUN-1122',tariff:'LT-II Commercial',sanctioned:'15 kW',currentReading:9400,previousReading:8100,currentDate:'12 May 2025',bills:[{month:'May 2025',opening:8100,closing:9400,units:1300,rate:7.0,amount:9100,paid:true,paidDate:'10 May 2025'},{month:'Apr 2025',opening:6800,closing:8100,units:1300,rate:7.0,amount:9100,paid:true,paidDate:'07 Apr 2025'}]},solar:{panels:6,working:[1,1,1,1,1,1],capacity:'2 kW',production:1800,health:95,serials:['SP-P01','SP-P02','SP-P03','SP-P04','SP-P05','SP-P06']},pmChecks:[{no:1,point:'Daily Checklist',criteria:'Basic checks',items:['Hour meter reading','Fuel level check','Temperature normal']}],alarms:[]},
+  'KABLR0987':{dg:{co:'Mahindra',sn:'MP-2018-BLR-9870',cap:'82.5 kVA',tank:'200 L',fuel:18,nextTopup:'05 May 2025',nextPM:'20 May 2025',lastFill:{kw:8834,hmr:3890,dt:'28 Apr 2025 09:45'}},bat:{co:'HBL Power',cap:'2V / 800Ah VRLA',cnt:12,health:61,working:[1,1,0,1,1,0,1,1,1,0,1,1],serials:['HBL-201','HBL-202','HBL-203','HBL-204','HBL-205','HBL-206','HBL-207','HBL-208','HBL-209','HBL-210','HBL-211','HBL-212']},rect:{cnt:3,models:['Delta','Delta','Delta'],load:88,working:[1,0,1]},eb:{consumer:'BESCOM-BLR-9870',tariff:'HT-I Industrial',sanctioned:'20 kW',currentReading:24300,previousReading:22100,currentDate:'12 May 2025',bills:[{month:'May 2025',opening:22100,closing:24300,units:2200,rate:6.8,amount:14960,paid:false,dueDate:'20 May 2025'},{month:'Apr 2025',opening:19900,closing:22100,units:2200,rate:6.8,amount:14960,paid:true,paidDate:'08 Apr 2025'}]},solar:{panels:8,working:[1,0,1,1,0,1,1,1],capacity:'3 kW',production:2100,health:72,serials:['SP-B01','SP-B02','SP-B03','SP-B04','SP-B05','SP-B06','SP-B07','SP-B08']},pmChecks:[{no:1,point:'Full PM Inspection',criteria:'Complete check',items:['Visual inspection','Oil change','Filter replacement','Sensor test']}],alarms:['Mains fail','DG fuel critical','Battery low']},
+};
+
+var APP={user:null,currentSite:null,currentTab:'basic',checkedIn:{},pmChecked:{},pmFiles:{}};
+
+function h(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function $(id){return document.getElementById(id);}
+function set(id,html){var e=$(id);if(e)e.innerHTML=html;}
+function hide(id){var e=$(id);if(e)e.style.display='none';}
+function show(id){var e=$(id);if(e)e.style.display='';}
+
+function openModal(html){var ov=document.createElement('div');ov.className='modal-overlay';ov.id='activeModal';var box=document.createElement('div');box.className='modal-sheet';box.innerHTML=html;box.onclick=function(e){e.stopPropagation();};ov.onclick=closeModal;ov.appendChild(box);$('modalRoot').appendChild(ov);}
+function closeModal(){var m=$('activeModal');if(m)m.parentNode.removeChild(m);}
+
+function doLogin(){var email=$('lEmail').value.trim().toLowerCase();var pw=$('lPw').value;var btn=$('lBtn');btn.disabled=true;btn.textContent='SIGNING IN...';setTimeout(function(){var u=USERS.find(function(u){return u.email===email&&u.pw===pw;});if(u){APP.user=u;$('lErr').style.display='none';initApp();}else{$('lErr').style.display='flex';$('lErrMsg').textContent='Invalid credentials';btn.disabled=false;btn.textContent='SIGN IN';}},700);}
+function doLogout(){APP.user=null;APP.currentSite=null;hide('appShell');show('loginPage');$('lEmail').value='';$('lPw').value='';$('lBtn').disabled=false;$('lBtn').textContent='SIGN IN';}
+function initApp(){hide('loginPage');var ap=document.getElementById('appShell');ap.style.display='flex';var rm=ROLE_META[APP.user.role];var rb=$('roleBadge');rb.style.background=rm.bg;rb.style.borderColor=rm.col+'40';rb.style.color=rm.col;rb.textContent=APP.user.role.toUpperCase();goHome();}
+
+function goHome(){APP.currentSite=null;hide('sitePage');show('homePage');renderStats();renderSiteList('');$('siteSearch').value='';}
+function renderStats(){var total=SITES.length;var live=SITES.filter(function(s){return s.live;}).length;var alarms=Object.values(INFRA).reduce(function(a,b){return a+(b.alarms?b.alarms.length:0);},0);set('statsStrip','<div class="stat-box"><div class="stat-box-val" style="color:#0EA5E9">'+total+'</div><div class="stat-box-lbl">Total</div></div><div class="stat-box"><div class="stat-box-val" style="color:#16A34A">'+live+'</div><div class="stat-box-lbl">Live</div></div><div class="stat-box"><div class="stat-box-val" style="color:#DC2626">'+alarms+'</div><div class="stat-box-lbl">Alarms</div></div><div class="stat-box"><div class="stat-box-val" style="color:#D97706">'+SITES.length+'</div><div class="stat-box-lbl">Monitored</div></div>');}
+
+function filterSites(q){APP.filterQ=q;renderSiteList(q);}
+function renderSiteList(q){q=(q||'').toLowerCase();var sites=q?SITES.filter(function(s){return[s.id,s.name,s.circle].some(function(v){return v.toLowerCase().includes(q);});}):SITES;if(!sites.length){set('siteList','<div style="text-align:center;padding:40px;color:#94A3B8">No sites found</div>');return;}var html='';sites.forEach(function(s,i){var inf=INFRA[s.id];var alarmCnt=inf&&inf.alarms?inf.alarms.length:0;html+='<div class="site-card" style="animation-delay:'+(i*45)+'ms" onclick="openSite(\''+s.id+'\')">'+'<div style="display:flex;justify-content:space-between;align-items:flex-start">'+'<div style="display:flex;gap:11px">'+'<div style="background:'+(s.live?'rgba(22,163,74,.12)':'rgba(220,38,38,.1)')+';border-radius:10px;padding:9px;font-size:20px">'+(s.live?'📡':'📴')+'</div>'+'<div>'+'<div class="fw8 fs15" style="color:'+(s.live?'#0F172A':'#94A3B8')+'">'+h(s.id)+'</div>'+'<div class="fs12 fw7 ink2" style="margin-top:2px">'+h(s.name)+'</div>'+'<div style="display:flex;gap:8px;margin-top:5px;font-size:11px;color:#334155">📍 '+h(s.circle)+' › '+h(s.cluster)+'</div>'+'</div>'+'</div>'+'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">'+'<span class="tag" style="background:'+(s.live?'#DCFCE7':'#FEE2E2')+';color:'+(s.live?'#16A34A':'#DC2626')+'">'+(s.live?'LIVE':'OFF')+'</span>'+(alarmCnt?'<span class="tag" style="background:#FEE2E2;color:#DC2626">🔴 '+alarmCnt+'</span>':'')+'<span class="tag" style="background:#F1F5F9;color:#334155">'+s.tenants+' tenants</span>'+'</div>'+'</div>'+'</div>';});set('siteList',html);}
+
+function openSite(siteId){APP.currentSite=siteId;var site=SITES.find(function(s){return s.id===siteId;});var inf=INFRA[siteId];hide('homePage');document.getElementById('sitePage').style.display='flex';set('siteHeaderId',h(site.id));set('siteHeaderName',h(site.name));$('gpsCoords').textContent='Lat '+site.lat+' · Lng '+site.lng;var gb=$('gpsBtn');if(APP.checkedIn[siteId]){gb.textContent='Checked In ✓';gb.className='btn btn-sm btn-green';gb.disabled=true;}else{gb.textContent='Check In';gb.className='btn btn-sm btn-sky';gb.disabled=false;}var tabs=[{id:'basic',label:'Basic',icon:'ℹ️'},{id:'dg',label:'DG',icon:'⛽'},{id:'battery',label:'Battery',icon:'🔋'},{id:'rectifier',label:'Rectifier',icon:'⚡'},{id:'eb',label:'EB',icon:'🔌'},{id:'solar',label:'Solar',icon:'☀️'},{id:'pm',label:'PM',icon:'✅'},{id:'alarms',label:'Alarms'+(inf&&inf.alarms&&inf.alarms.length?' ('+inf.alarms.length+')':''),icon:'🚨'}];var tabHtml=tabs.map(function(t){return '<button class="tab-btn '+(APP.currentTab===t.id?'active':'')+'" data-tid="'+t.id+'" onclick="switchTab(\''+t.id+'\')" style="--tc:#0EA5E9">'+t.icon+' '+h(t.label)+'</button>';}).join('');set('tabStrip',tabHtml);APP.currentTab='basic';renderTabContent('basic');}
+
+function doCheckIn(){APP.checkedIn[APP.currentSite]=Date.now();var gb=$('gpsBtn');gb.textContent='Checked In ✓';gb.className='btn btn-sm btn-green';gb.disabled=true;}
+function switchTab(tid){APP.currentTab=tid;document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tid===tid);});renderTabContent(tid);}
+function renderTabContent(tid){var inf=INFRA[APP.currentSite];var site=SITES.find(function(s){return s.id===APP.currentSite;});var html='<div class="tab-panel active">';if(tid==='basic')html+=buildBasic(site,inf);else if(tid==='dg')html+=buildDG(inf);else if(tid==='battery')html+=buildBattery(inf);else if(tid==='rectifier')html+=buildRectifier(inf);else if(tid==='eb')html+=buildEB(inf);else if(tid==='solar')html+=buildSolar(inf);else if(tid==='pm')html+=buildPM(inf);else if(tid==='alarms')html+=buildAlarms(inf);html+='</div>';set('tabContent',html);}
+
+function buildBasic(site,inf){var html='<div class="shdr">ℹ️ SITE INFORMATION</div><div class="info-grid"><div class="info-item"><div class="info-lbl">Site ID</div><div class="info-val">'+h(site.id)+'</div></div><div class="info-item"><div class="info-lbl">Name</div><div class="info-val">'+h(site.name)+'</div></div><div class="info-item"><div class="info-lbl">Circle</div><div class="info-val">'+h(site.circle)+'</div></div><div class="info-item"><div class="info-lbl">Cluster</div><div class="info-val">'+h(site.cluster)+'</div></div><div class="info-item"><div class="info-lbl">Status</div><div class="info-val"><span class="tag" style="background:'+(site.live?'#DCFCE7':'#FEE2E2')+';color:'+(site.live?'#16A34A':'#DC2626')+'">'+(site.live?'LIVE':'OFF')+'</span></div></div><div class="info-item"><div class="info-lbl">Tenancies</div><div class="info-val fw8" style="color:#0EA5E9">'+site.tenants+' Sites</div></div></div>';html+='<div class="dvdr"></div>';html+='<div class="shdr">👥 SITE OWNERS & CONTACTS</div>';site.owners.forEach(function(o,i){html+='<div class="owner-card"><div class="owner-card-head"><div class="owner-avatar">'+String(o.name).charAt(0)+'</div><div class="owner-info"><div class="owner-name">'+h(o.name)+'</div><div class="owner-role">'+h(o.role)+'</div></div></div><div class="owner-details"><div class="owner-detail-item"><div class="owner-detail-lbl">📱 Phone</div><div class="owner-detail-val">'+h(o.phone)+'</div></div><div class="owner-detail-item"><div class="owner-detail-lbl">✉️ Email</div><div class="owner-detail-val" style="font-size:11px;word-break:break-all">'+h(o.email)+'</div></div><div class="owner-detail-item" style="grid-column:1/-1"><div class="owner-detail-lbl">📍 Address</div><div class="owner-detail-val">'+h(o.address)+'</div></div></div></div>';});return html;}
+
+function buildDG(inf){var dg=inf.dg;var col=dg.fuel<=20?'#DC2626':dg.fuel<=40?'#D97706':'#16A34A';var html='<div class="shdr">⛽ DG ENGINE</div><div class="info-grid"><div class="info-item"><div class="info-lbl">Company</div><div class="info-val">'+h(dg.co)+'</div></div><div class="info-item"><div class="info-lbl">Serial No</div><div class="info-val" style="font-size:10px;font-family:monospace">'+h(dg.sn)+'</div></div><div class="info-item"><div class="info-lbl">Capacity</div><div class="info-val">'+h(dg.cap)+'</div></div><div class="info-item"><div class="info-lbl">Tank Cap</div><div class="info-val">'+h(dg.tank)+'</div></div><div class="info-item"><div class="info-lbl">Next Top-up</div><div class="info-val fw8" style="color:#EA580C">'+h(dg.nextTopup)+'</div></div><div class="info-item"><div class="info-lbl">Next Full PM</div><div class="info-val fw8" style="color:#7C3AED">'+h(dg.nextPM)+'</div></div><div class="info-item"><div class="info-lbl">Last Fill kWh</div><div class="info-val fw8" style="color:#0EA5E9">'+dg.lastFill.kw+' kWh</div></div><div class="info-item"><div class="info-lbl">Last Fill HMR</div><div class="info-val fw8" style="color:#7C3AED">'+dg.lastFill.hmr+' hrs</div></div><div class="info-item"><div class="info-lbl">Filled Date</div><div class="info-val">'+h(dg.lastFill.dt)+'</div></div></div>';html+='<div class="dvdr"></div><div class="shdr">🔋 DG BATTERY</div><div class="info-grid"><div class="info-item"><div class="info-lbl">Company</div><div class="info-val">'+h(inf.bat.co)+'</div></div><div class="info-item"><div class="info-lbl">Capacity</div><div class="info-val">'+h(inf.bat.cap)+'</div></div><div class="info-item"><div class="info-lbl">Banks</div><div class="info-val">'+inf.bat.cnt+' units</div></div><div class="info-item"><div class="info-lbl">Health</div><div class="info-val fw8" style="color:'+(inf.bat.health>=80?'#16A34A':'#D97706')+'">'+inf.bat.health+'%</div></div></div>';html+='<div class="dvdr"></div><div class="shdr">⛽ FUEL LEVEL</div><div style="display:flex;gap:16px;margin-bottom:14px"><div style="flex-shrink:0"><div style="width:60px;height:120px;border-radius:8px 8px 10px 10px;border:3px solid '+col+';overflow:hidden;position:relative;background:#F8FAFC"><div class="tank-fill" style="height:'+dg.fuel+'%;background:linear-gradient(180deg,'+col+'30,'+col+'90 50%,'+col+'DD)">'+(dg.fuel>18?'<div class="tank-pct">'+dg.fuel+'%</div>':'')+'</div></div></div><div style="flex:1"><div style="display:flex;gap:3px;margin:6px 0">'+Array.from({length:10}).map(function(_,i){return '<div style="flex:1;height:8px;border-radius:4px;background:'+(i<Math.round(dg.fuel/10)?col:'#E2E8F0')+'"></div>';}).join('')+'</div><div style="display:flex;justify-content:space-between;font-size:9px;color:#94A3B8;margin-bottom:12px"><span>0%</span><span class="fw8" style="color:'+col+'">'+dg.fuel+'%</span><span>100%</span></div><div style="display:inline-flex;align-items:center;gap:6px;background:'+col+'12;border:1.5px solid '+col+'30;border-radius:9px;padding:6px 12px"><span class="led '+(dg.fuel<=20?'led-r':dg.fuel<=40?'led-y':'led-g')+'"></span><span class="fs12 fw8" style="color:'+col+'">'+(dg.fuel<=20?'CRITICAL':dg.fuel<=40?'LOW':'NORMAL')+'</span></div></div></div>';return html;}
+
+function buildBattery(inf){var bat=inf.bat;var faults=bat.working.filter(function(w){return !w;}).length;var html='<div class="shdr">🔋 BATTERY BANK</div><div style="display:flex;gap:8px;margin-bottom:12px"><span class="tag" style="background:#F1F5F9;color:#334155">'+h(bat.co)+'</span><span class="tag" style="background:#F1F5F9;color:#334155">'+bat.cnt+' Banks</span>'+(faults?'<span class="tag" style="background:#FEE2E2;color:#DC2626">'+faults+' Fault</span>':'')+'</div>';html+='<div style="margin-bottom:12px"><div class="fs11 fw7 ink2 mb8">Health: <span class="fw9" style="color:'+(bat.health>=80?'#16A34A':'#D97706')+'">'+bat.health+'%</span></div><div style="height:10px;background:#F1F5F9;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+bat.health+'%;background:linear-gradient(90deg,'+(bat.health>=80?'#16A34A':'#D97706')+');border-radius:99px"></div></div></div>';html+='<div style="background:#FEF3C7;border:1px solid rgba(217,119,6,0.3);border-radius:10px;padding:10px 13px;margin-bottom:12px;font-size:12px;font-weight:600;color:#92400E"><span>💡</span> Tap battery to view details</div>';html+='<div class="bat-grid">';bat.working.forEach(function(w,i){var bc=!w?'#DC2626':bat.health>=80?'#16A34A':'#D97706';html+='<div class="bat-u" onclick="showBatModal('+i+')" style="cursor:pointer"><div class="bat-cap" style="background:'+bc+'"></div><div class="bat-body" style="border-color:'+bc+'"><div class="bat-fill" style="height:'+(w?bat.health:0)+'%;background:'+bc+'"></div></div><div class="bat-lbl" style="color:'+bc+'">B'+(i+1)+'</div></div>';});html+='</div>';return html;}
+
+function showBatModal(idx){var inf=INFRA[APP.currentSite];var bat=inf.bat;var w=bat.working[idx];var col=!w?'#DC2626':bat.health>=80?'#16A34A':'#D97706';var modalHtml='<div class="modal-drag"></div><div class="modal-header"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:20px">🔋</div><div><div class="fw8 fs15">Battery Bank B'+(idx+1)+'</div><div style="display:flex;align-items:center;gap:6px;margin-top:3px"><span class="led '+(w?bat.health>=80?'led-g':'led-y':'led-r')+'"></span><span class="fw7 fs12" style="color:'+col+'">'+(w?'Health: '+bat.health+'%':'FAULT')+'</span></div></div></div><button class="modal-close" onclick="closeModal()">✕</button></div><div class="modal-body"><div class="info-grid"><div class="info-item"><div class="info-lbl">Company</div><div class="info-val fw7">'+h(bat.co)+'</div></div><div class="info-item"><div class="info-lbl">Serial Number</div><div class="info-val" style="font-size:10px;font-family:monospace;font-weight:700">'+h(bat.serials[idx]||'N/A')+'</div></div><div class="info-item"><div class="info-lbl">Capacity</div><div class="info-val fw7">'+h(bat.cap)+'</div></div><div class="info-item"><div class="info-lbl">Bank Number</div><div class="info-val fw7">B'+(idx+1)+' of '+bat.cnt+'</div></div><div class="info-item"><div class="info-lbl">Status</div><div class="info-val">'+(w?'<span class="tag" style="background:#DCFCE7;color:#16A34A;font-weight:700">✓ Operational</span>':'<span class="tag" style="background:#FEE2E2;color:#DC2626;font-weight:700">✕ FAULT</span>')+'</div></div><div class="info-item"><div class="info-lbl">Health</div><div class="info-val fw8" style="color:'+col+'">'+(w?bat.health+'%':'—')+'</div></div></div><div class="dvdr"></div><div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px;background:#F8FAFC;border-radius:10px"><div style="position:relative;width:28px;height:54px"><div style="width:11px;height:5px;background:'+col+';border-radius:2px 2px 0 0;margin:0 auto"></div><div style="width:28px;height:46px;border:2.5px solid '+col+';border-radius:3px 3px 6px 6px;overflow:hidden;background:#fff"><div style="position:absolute;bottom:0;left:0;right:0;height:'+(w?bat.health:0)+'%;background:'+col+';opacity:0.9"></div></div></div><div class="fw7 fs13" style="color:'+col+'">'+(w?'In Service':'Needs Replacement')+'</div></div></div>';openModal(modalHtml);}
+
+function buildRectifier(inf){var rect=inf.rect;var faults=rect.working.filter(function(w){return !w;}).length;var html='<div class="shdr">⚡ RECTIFIER MODULES</div><div style="display:flex;gap:8px;margin-bottom:12px"><span class="tag" style="background:#F1F5F9;color:#334155">'+rect.cnt+' Modules</span><span class="tag" style="background:#F1F5F9;color:#334155">'+rect.load+'% Load</span>'+(faults?'<span class="tag" style="background:#FEE2E2;color:#DC2626">'+faults+' Offline</span>':'')+'</div>';html+='<div style="margin-bottom:12px"><div class="fs11 fw7 ink2 mb8">System Load: <span class="fw9" style="color:'+(rect.load>85?'#EA580C':'#16A34A')+'">'+rect.load+'%</span></div><div style="height:10px;background:#F1F5F9;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+rect.load+'%;background:linear-gradient(90deg,'+(rect.load>85?'#EA580C':'#16A34A')+');border-radius:99px"></div></div></div>';html+='<div class="rect-grid">';rect.working.forEach(function(w,i){var col=!w?'#DC2626':rect.load>85?'#EA580C':'#16A34A';html+='<div class="rect-u" onclick="showRectModal('+i+')" style="border-color:'+col+'40;cursor:pointer"><div class="rect-body" style="background:'+(w?'#fff':'rgba(220,38,38,.1)')+';border-color:'+col+'">'+(w?'<div style="font-size:10px;font-weight:900;color:'+col+';text-align:center">AC→DC<br><span style="font-size:8px;color:#94A3B8">48V</span></div>':'<div style="font-size:18px;font-weight:900;color:#DC2626">✕</div>')+'</div><div class="fw8 fs12" style="color:'+col+'">R-'+(i+1)+'</div>'+(w?'<div class="tag" style="background:'+col+'18;color:'+col+';font-size:9px;margin-top:4px">'+(rect.load>85?'OVERLOAD':'NORMAL')+'</div>':'<div class="tag" style="background:#FEE2E2;color:#DC2626;font-size:9px;margin-top:4px">OFFLINE</div>')+'</div>';});html+='</div>';if(rect.load>85)html+='<div class="alert-box" style="background:#FFEDD5;border-color:#EA580C;color:#92400E"><span>⚠️</span><span>Load exceeds 85% — Add module or reduce load</span></div>';return html;}
+
+function showRectModal(idx){var inf=INFRA[APP.currentSite];var rect=inf.rect;var w=rect.working[idx];var col=!w?'#DC2626':rect.load>85?'#EA580C':'#16A34A';var modalHtml='<div class="modal-drag"></div><div class="modal-header"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:20px">⚡</div><div><div class="fw8 fs15">Rectifier R-'+(idx+1)+'</div><div style="display:flex;align-items:center;gap:6px;margin-top:3px"><span class="led '+(w?(rect.load>85?'led-y':'led-g'):'led-r')+'"></span><span class="fw7 fs12" style="color:'+col+'">'+(w?(rect.load>85?'OVERLOAD':'NORMAL'):'OFFLINE')+'</span></div></div></div><button class="modal-close" onclick="closeModal()">✕</button></div><div class="modal-body"><div class="info-grid"><div class="info-item"><div class="info-lbl">Model</div><div class="info-val">'+h(rect.models[idx])+'</div></div><div class="info-item"><div class="info-lbl">Unit No</div><div class="info-val fw7">R-'+(idx+1)+' of '+rect.cnt+'</div></div><div class="info-item"><div class="info-lbl">Voltage</div><div class="info-val fw7">48V DC</div></div><div class="info-item"><div class="info-lbl">Load</div><div class="info-val fw8" style="color:'+col+'">'+rect.load+'%</div></div><div class="info-item"><div class="info-lbl">Status</div><div class="info-val">'+(w?'<span class="tag" style="background:'+(rect.load>85?'#FFEDD5':'#DCFCE7')+';color:'+col+'">'+( rect.load>85?'OVERLOAD':'NORMAL')+'</span>':'<span class="tag" style="background:#FEE2E2;color:#DC2626">OFFLINE</span>')+'</div></div></div></div>';openModal(modalHtml);}
+
+function buildEB(inf){var eb=inf.eb;var curr=eb.bills[0];var prev=eb.bills[1]||{};var currStatus=curr.paid?'Paid':'Due';var col=curr.paid?'#16A34A':'#DC2626';var html='<div class="shdr">🔌 EB CONNECTION</div><div class="info-grid"><div class="info-item"><div class="info-lbl">Consumer No</div><div class="info-val" style="font-size:10px;font-family:monospace">'+h(eb.consumer)+'</div></div><div class="info-item"><div class="info-lbl">Tariff</div><div class="info-val">'+h(eb.tariff)+'</div></div><div class="info-item"><div class="info-lbl">Sanctioned Load</div><div class="info-val">'+h(eb.sanctioned)+'</div></div><div class="info-item"><div class="info-lbl">Current Reading</div><div class="info-val fw8" style="color:#0EA5E9">'+eb.currentReading+' kWh</div></div></div>';html+='<div class="dvdr"></div>';html+='<div class="shdr">📊 PRESENT MONTH BILL</div>';html+='<div class="bill-card"><div class="bill-card-head"><div class="bill-card-title">'+h(curr.month)+'</div><div class="bill-card-status"><span class="led '+(col==='#16A34A'?'led-g':'led-r')+'"></span><span style="color:'+col+'">'+currStatus+'</span></div></div><div class="bill-table"><div class="bill-table-row"><span class="bill-table-row-label">Opening Reading</span><span class="bill-table-row-value">'+curr.opening.toLocaleString()+' kWh</span></div><div class="bill-table-row"><span class="bill-table-row-label">Closing Reading</span><span class="bill-table-row-value">'+curr.closing.toLocaleString()+' kWh</span></div><div class="bill-table-row"><span class="bill-table-row-label">Units Consumed</span><span class="bill-table-row-value">'+curr.units.toLocaleString()+' kWh</span></div><div class="bill-table-row"><span class="bill-table-row-label">Rate/Unit</span><span class="bill-table-row-value">Rs. '+curr.rate.toFixed(2)+'</span></div><div class="bill-table-row" style="grid-column:1/-1;border-top:1px solid #E2E8F0;padding-top:8px"><span class="bill-table-row-label" style="font-size:12px;font-weight:900">Amount</span><span class="bill-table-row-value fw9" style="font-size:14px;color:'+col+'">Rs. '+curr.amount.toLocaleString()+'</span></div><div class="bill-table-row" style="grid-column:1/-1"><span class="bill-table-row-label">'+( curr.paid?'Paid On':'Due Date')+'</span><span class="bill-table-row-value" style="color:'+(curr.paid?'#16A34A':'#DC2626')+'">'+h(curr.paid?curr.paidDate:curr.dueDate)+'</span></div></div></div>';html+='<div class="dvdr"></div>';html+='<div class="shdr">📅 PREVIOUS MONTH BILL</div>';if(prev.month){html+='<div class="bill-card"><div class="bill-card-head"><div class="bill-card-title">'+h(prev.month)+'</div><div class="bill-card-status"><span class="led led-g"></span><span style="color:#16A34A">Paid</span></div></div><div class="bill-table"><div class="bill-table-row"><span class="bill-table-row-label">Opening Reading</span><span class="bill-table-row-value">'+prev.opening.toLocaleString()+' kWh</span></div><div class="bill-table-row"><span class="bill-table-row-label">Closing Reading</span><span class="bill-table-row-value">'+prev.closing.toLocaleString()+' kWh</span></div><div class="bill-table-row"><span class="bill-table-row-label">Units Consumed</span><span class="bill-table-row-value">'+prev.units.toLocaleString()+' kWh</span></div><div class="bill-table-row" style="grid-column:1/-1;border-top:1px solid #E2E8F0;padding-top:8px"><span class="bill-table-row-label" style="font-size:12px;font-weight:900">Amount</span><span class="bill-table-row-value fw9" style="font-size:14px;color:#16A34A">Rs. '+prev.amount.toLocaleString()+'</span></div><div class="bill-table-row" style="grid-column:1/-1"><span class="bill-table-row-label">Paid On</span><span class="bill-table-row-value" style="color:#16A34A">'+h(prev.paidDate)+'</span></div></div></div>';}return html;}
+
+function buildSolar(inf){var sol=inf.solar;var faults=sol.working.filter(function(w){return !w;}).length;var html='<div class="shdr">☀️ SOLAR PANEL SYSTEM</div><div style="display:flex;gap:8px;margin-bottom:12px"><span class="tag" style="background:#F1F5F9;color:#334155">'+sol.panels+' Panels</span><span class="tag" style="background:#F1F5F9;color:#334155">'+h(sol.capacity)+'</span><span class="tag" style="background:#FFEDD5;color:#EA580C">'+sol.production+' W</span>'+(faults?'<span class="tag" style="background:#FEE2E2;color:#DC2626">'+faults+' Fault</span>':'')+'</div>';html+='<div style="margin-bottom:12px"><div class="fs11 fw7 ink2 mb8">Panel Health: <span class="fw9" style="color:'+(sol.health>=80?'#16A34A':'#D97706')+'">'+sol.health+'%</span></div><div style="height:10px;background:#F1F5F9;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+sol.health+'%;background:linear-gradient(90deg,'+(sol.health>=80?'#16A34A':'#D97706')+');border-radius:99px"></div></div></div>';html+='<div style="background:#FFFAED;border:1px solid rgba(250,204,21,0.3);border-radius:10px;padding:10px 13px;margin-bottom:12px;font-size:12px;font-weight:600;color:#92400E"><span>☀️</span> Solar panels currently producing '+sol.production+'W power</div>';html+='<div class="solar-grid">';sol.working.forEach(function(w,i){var col=!w?'#DC2626':sol.health>=80?'#16A34A':'#D97706';html+='<div class="solar-panel" onclick="showSolarModal('+i+')" style="cursor:pointer;border-color:'+col+'40">'+'<div class="solar-body" style="border-color:'+col+'">'+(w?'<div class="solar-rays">☀️</div>':'<div style="font-size:18px;font-weight:900;color:#DC2626">✕</div>')+'</div>'+'<div class="solar-lbl" style="color:'+col+'">P-'+(i+1)+'</div>'+(w?'<div class="tag" style="background:'+col+'18;color:'+col+';font-size:9px;margin-top:4px">WORKING</div>':'<div class="tag" style="background:#FEE2E2;color:#DC2626;font-size:9px;margin-top:4px">FAULT</div>')+'</div>';});html+='</div>';return html;}
+
+function showSolarModal(idx){var inf=INFRA[APP.currentSite];var sol=inf.solar;var w=sol.working[idx];var col=!w?'#DC2626':sol.health>=80?'#16A34A':'#D97706';var modalHtml='<div class="modal-drag"></div><div class="modal-header"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:20px">☀️</div><div><div class="fw8 fs15">Solar Panel P-'+(idx+1)+'</div><div style="display:flex;align-items:center;gap:6px;margin-top:3px"><span class="led '+(w?sol.health>=80?'led-g':'led-y':'led-r')+'"></span><span class="fw7 fs12" style="color:'+col+'">'+(w?'Health: '+sol.health+'%':'FAULT')+'</span></div></div></div><button class="modal-close" onclick="closeModal()">✕</button></div><div class="modal-body"><div class="info-grid"><div class="info-item"><div class="info-lbl">Panel Serial</div><div class="info-val" style="font-size:10px;font-family:monospace;font-weight:700">'+h(sol.serials[idx]||'N/A')+'</div></div><div class="info-item"><div class="info-lbl">Panel No</div><div class="info-val fw7">P-'+(idx+1)+' of '+sol.panels+'</div></div><div class="info-item"><div class="info-lbl">Capacity</div><div class="info-val fw7">'+h(sol.capacity)+'</div></div><div class="info-item"><div class="info-lbl">Status</div><div class="info-val">'+(w?'<span class="tag" style="background:#DCFCE7;color:#16A34A;font-weight:700">✓ Working</span>':'<span class="tag" style="background:#FEE2E2;color:#DC2626;font-weight:700">✕ FAULT</span>')+'</div></div><div class="info-item" style="grid-column:1/-1"><div class="info-lbl">Health</div><div class="info-val fw8" style="color:'+col+';font-size:14px">'+(w?sol.health+'%':'—')+'</div></div></div><div class="dvdr"></div><div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px;background:#FFFAED;border-radius:10px"><div style="font-size:32px;animation:pulse 2s infinite">☀️</div><div class="fw7 fs13" style="color:'+col+'">'+(w?'Generating Power':'Needs Inspection')+'</div></div></div>';openModal(modalHtml);}
+
+function buildPM(inf){var checks=inf.pmChecks||[];if(!checks.length)return '<div style="text-align:center;padding:32px;color:#94A3B8">No PM data</div>';var html='<div class="shdr">✅ PM CHECKLIST</div><div style="background:#E0F2FE;border:1px solid rgba(14,165,233,0.3);border-radius:10px;padding:11px 13px;margin-bottom:12px;font-size:12px;font-weight:700;color:#0369A1;display:flex;gap:8px;align-items:flex-start"><span style="font-size:16px">📋</span><span>Complete items & upload photos to document PM</span></div><div class="pm-checklist">';checks.forEach(function(c,ci){var key=APP.currentSite+'_pm_'+c.no;var checked=APP.pmChecked[key];html+='<div class="pm-check-item"><div class="pm-check-box '+(checked?'checked':'')+'" onclick="togglePMCheck(\''+key+'\')" style="cursor:pointer">'+(checked?'<span style="color:#fff;font-size:12px;font-weight:bold">✓</span>':'')+'</div><div style="flex:1"><div class="pm-check-label">'+h(c.no)+'. '+h(c.point)+'</div><div style="font-size:10px;color:#94A3B8;margin-top:3px"><span style="font-weight:700">Standard:</span> '+h(c.criteria)+'</div>';if(c.items&&c.items.length){html+='<div class="pm-sub-items">';c.items.forEach(function(item,si){var subkey=key+'_sub_'+si;var subchecked=APP.pmChecked[subkey];html+='<div class="pm-sub-item"><input type="checkbox" '+(subchecked?'checked':'')+' onchange="togglePMCheck(\''+subkey+'\')"><span>'+h(item)+'</span></div>';});html+='</div>';}html+='<div class="photo-upload-section" id="upload-'+key+'" onclick="triggerFileInput(\'file-'+key+'\')" ondrop="handleDrop(event,\''+key+'\')" ondragover="event.preventDefault();this.classList.add(\'dragover\')" ondragleave="this.classList.remove(\'dragover\')"><span style="font-size:18px">📷</span><span>Tap to upload photos</span><input type="file" id="file-'+key+'" class="photo-input" accept="image/*" multiple onchange="handleFileSelect(event,\''+key+'\')"></div>';var files=APP.pmFiles[key]||[];if(files.length){html+='<div class="photo-list">';files.forEach(function(f,fi){html+='<div class="photo-item"><span class="photo-item-name">'+h(f.substring(0,15)+'...')+'</span><span class="photo-item-close" onclick="removePMFile(\''+key+'\','+fi+')">✕</span></div>';});html+='</div>';}html+='</div>'+'</div>';});html+='</div>';var allDone=checks.every(function(c){return APP.pmChecked[APP.currentSite+'_pm_'+c.no];});var completionPct=allDone?100:Math.round((checks.filter(function(c){return APP.pmChecked[APP.currentSite+'_pm_'+c.no];}).length/checks.length)*100);html+='<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span class="fs11 fw7 ink2">Overall Progress</span><span class="fs12 fw8" style="color:'+(allDone?'#16A34A':'#D97706')+'">'+completionPct+'%</span></div><div style="height:10px;background:#F1F5F9;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+completionPct+'%;background:linear-gradient(90deg,'+(allDone?'#16A34A':'#D97706')+');border-radius:99px;transition:width 0.3s ease"></div></div></div>';if(allDone)html+='<div style="background:linear-gradient(135deg,#DCFCE7,#CCFBF1);border:1.5px solid rgba(22,163,74,0.3);border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px;color:#16A34A;font-weight:700;font-size:14px"><span style="font-size:24px">✅</span><div><span>All PM checks completed!</span><div style="font-size:10px;margin-top:2px;font-weight:600;color:#0D9488">Equipment status is GOOD for operation</div></div></div>';return html;}
+
+function buildAlarms(inf){var alarms=inf.alarms||[];if(!alarms.length)return '<div style="text-align:center;padding:40px"><div style="font-size:48px;margin-bottom:12px">✅</div><div class="fw8 fs14">All Clear</div></div>';var html='<div class="shdr">🚨 ACTIVE ALARMS ('+alarms.length+')</div>';alarms.forEach(function(a){html+='<div class="alert-box" style="background:#FEE2E2;border-color:#DC2626;color:#0F172A"><span style="font-size:18px">🔴</span><div><div class="fw8 fs12" style="color:#DC2626">'+h(a)+'</div></div></div>';});return html;}
+
+function togglePMCheck(key){APP.pmChecked[key]=!APP.pmChecked[key];renderTabContent('pm');}
+function triggerFileInput(inputId){document.getElementById(inputId).click();}
+function handleFileSelect(e,key){var files=e.target.files;if(files.length){if(!APP.pmFiles[key])APP.pmFiles[key]=[];for(var i=0;i<files.length;i++){APP.pmFiles[key].push(files[i].name);}renderTabContent('pm');}}
+function handleDrop(e,key){e.preventDefault();e.currentTarget.classList.remove('dragover');var files=e.dataTransfer.files;if(files.length){if(!APP.pmFiles[key])APP.pmFiles[key]=[];for(var i=0;i<files.length;i++){APP.pmFiles[key].push(files[i].name);}renderTabContent('pm');}}
+function removePMFile(key,idx){APP.pmFiles[key].splice(idx,1);renderTabContent('pm');}
+</script>
+</body>
+</html>
